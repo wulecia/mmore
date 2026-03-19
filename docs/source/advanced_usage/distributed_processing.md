@@ -113,7 +113,7 @@ output_folder/
 ## 🔧 Troubleshooting
 
 - **Workers not connecting**: ensure all nodes can access the scheduler file location
-- **Processing errors**: check logs on the master node
+- **Processing errors**: check logs ona the master node
 - **Performance issues**: adjust batch sizes and worker counts in the configuration
 
 ## ⚙️ Advanced Configuration
