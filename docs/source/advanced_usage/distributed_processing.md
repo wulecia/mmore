@@ -1,35 +1,41 @@
-# Distributed Document Processing Guide
-
-This guide explains how to set up and run distributed document processing for the RAG system across multiple nodes.
+# 🌐 Distributed Document Processing Guide
 
 ## Overview
 
-Distributed processing allows you to scale document indexing across multiple machines, significantly improving processing speed for large document collections. The system uses Dask for distributed task scheduling and execution.
+This guide explains how to set up and run distributed document processing for the RAG system across multiple nodes.
 
-## Prerequisites
+Distributed processing allows you to scale document indexing across multiple machines, significantly improving processing speed for large document collections. 
 
-- Multiple machines/nodes with network connectivity
-- Python environment on each node
-- Access to a shared filesystem or the ability to copy files between nodes
+The system uses Dask for distributed task scheduling and execution.
 
-## Setup Process
+## ✅ Prerequisites
 
-### 1. Prepare Your Configuration File
+Before starting, make sure you have:
 
-Check your processing configuration file ([example](/examples/process/config.yaml)), to include the distributed settings:
+- multiple machines/nodes with network connectivity
+- a Python environment on each node
+- access to a shared filesystem or the ability to copy files between nodes
+
+## 🛠️ Setup Process
+
+### 1. Prepare your configuration file
+
+Check your processing configuration file, for example [`examples/process/config.yaml`](../../../examples/process/config.yaml), and make sure it includes the distributed settings such as:
 
 ```yaml
 dispatcher_config:
   distributed: true
-  scheduler_file: "/path/to/scheduler.json"  # Shared location accessible by all nodes
+  scheduler_file: "/path/to/scheduler.json" 
 ```
+The `scheduler_file` should point to a shared location accessible by all nodes.
 
-Other important configuration options:
-- `input_folder`: Path to your documents
-- `output_folder`: Where processed results will be stored
-- `use_fast_processors`: Set to `true` for faster processing (may reduce accuracy)
 
-### 2. Install Dependencies on all Nodes
+Other important configuration options include:
+- `input_folder`: path to your documents
+- `output_folder`: xhere processed results will be stored
+- `use_fast_processors`: set to `true` for faster processing (may reduce accuracy)
+
+### 2. Install dependencies on all nodes
 
 On each node, run:
 
@@ -46,20 +52,20 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-### 3. Launch the Distributed Processing
+### 3. Launch the distributed processing
 
-#### Step 1: Start the Master Node (Rank 0)
+#### Step 1: Start the master node (rank 0)
 
 ```bash
 bash scripts/process_distributed.sh --config-file /path/to/config.yaml --rank 0
 ```
 
 The master node will:
-- Start the Dask scheduler
-- Launch a worker process
-- Prompt you to start the processing when ready
+- start the Dask scheduler
+- launch a worker process
+- prompt you to start the processing when ready
 
-#### Step 2: Start Worker Nodes (Rank > 0)
+#### Step 2: Start worker nodes (rank > 0)
 
 On each additional node, run:
 
@@ -67,24 +73,27 @@ On each additional node, run:
 bash scripts/process_distributed.sh --config-path /path/to/config.yaml --rank 1
 ```
 
-Replace `rank 1` with a unique rank number for each node (1, 2, 3, etc.). The node should be ready in a matter of 5 seconds.
+Replace `rank 1` with a unique rank number for each node (1, 2, 3, etc.). 
 
-#### Step 3: Begin Processing
+The node should be ready within a few seconds.
 
-Once all nodes are running, return to the master node and type `go`. The master node proceeds to crawl the input folder, split the workload among connected nodes and make them start their work.
+#### Step 3: Begin processing
 
-The dask server will be automatically shut down by the master node at the end of the processing. This will also shut down the dask workers on all the connected nodes.
+Once all nodes are running, return to the master node and type `go`.  
+The master node proceeds to crawl the input folder, split the workload among connected nodes and make them start their work.
 
-## Monitoring Progress
+At the end of processing, the dask server will be automatically shut down by the master node. This also stops the Dask workers on all the connected nodes.
 
-You can monitor the processing using the dashboard, just check its [documentation](./dashboard.md).
+## 📈 Monitoring Progress
+
+You can monitor the processing using the dashboard. See [Dashboard](../core_features/dashboard.md).
 
 The dashboard provides:
-- Real-time progress visualization
-- Worker status monitoring
-- The ability to gracefully stop workers
+- real-time progress visualization
+- worker status monitoring
+- the ability to gracefully stop workers
 
-## Output Structure
+## 📂 Output Structure
 
 After processing completes, the output will be organized as follows:
 
@@ -101,17 +110,22 @@ output_folder/
 └── images/
 ```
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-- **Workers not connecting**: Ensure all nodes can access the scheduler file location
-- **Processing errors**: Check logs on the master node
-- **Performance issues**: Adjust batch sizes and worker counts in the configuration
+- **Workers not connecting**: ensure all nodes can access the scheduler file location
+- **Processing errors**: check logs on the master node
+- **Performance issues**: adjust batch sizes and worker counts in the configuration
 
-## Advanced Configuration
+## ⚙️ Advanced Configuration
 
 For optimal performance, consider adjusting:
-- Processor batch sizes
-- Number of threads per worker
-- Memory limits for workers
+- processor batch sizes
+- number of threads per worker
+- memory limits for workers
 
-Refer to the [process documentation](./process.md) for more details on configuration options.
+Refer to [Process](../getting_started/process.md) for more details on configuration options.
+
+## See also
+
+- [Process](../getting_started/process.md)
+- [Dashboard](../core_features/dashboard.md)
