@@ -17,6 +17,7 @@ exclude_patterns = ["build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "furo"
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 html_title = "MMORE Documentation"
 # Uncomment if you want to use a project logo placed in docs/source/_static/
 # html_logo = "_static/mmore_logo.jpg"

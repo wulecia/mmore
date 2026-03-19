@@ -100,8 +100,4 @@ Here is a quick overview of the main pages:
 - [For developers](for_devs.md): contributor and internal development documentation
 - [Index API](index_api.md): API-oriented reference for indexing-related functionality
 
-## Notes
 
-This documentation is still evolving. Some sections may be more detailed than others, and some pages may contain implementation details that will later be reorganized or expanded.
-
-The goal is to progressively make the documentation clearer, more structured, and easier to navigate for both users and contributors.

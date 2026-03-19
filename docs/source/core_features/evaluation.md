@@ -1,21 +1,38 @@
-# 🤖 MMORE RAG Evaluation Pipeline
+# 📊 MMORE RAG Evaluation Pipeline
+
+## Overview
+
+The `RAG` module includes an evaluator that can assess the full RAG pipeline, from context retrieval to the final LLM output.
+
+The evaluation workflow consists of four main steps:
+
+1. prepare a benchmark evaluation dataset in the required format
+2. choose the metrics to evaluate
+3. configure the evaluator, indexer, and RAG pipeline
+4. run the evaluation for the selected retriever and LLM setup
+
+MMORE relies on [RAGAS](https://docs.ragas.io/) for evaluation. RAGAS is a library designed for evaluating LLM applications.
 
 ## 💡 TL;DR
 
-The `RAG` module comes with an Evaluator that allows you to evaluate your full RAG pipeline—from the context retrieval to the LLM's output:
+The evaluator lets you measure both retrieval quality and answer quality in a single workflow.
 
-1. **Prepare your benchmark evaluation dataset** in the required format.
-2. **Choose your list of metrics** to evaluate [Available Metrics](https://docs.ragas.io/en/latest/concepts/metrics/available_metrics/).
-3. **Set up your configuration files** for the evaluator, indexer, and RAG pipeline.
-4. **Run the evaluation** for your RAG setup (retriever + LLM).
+In practice, this means:
 
-🚀 **Powered by RAGAS**: Ragas is a library designed to supercharge the evaluation of Large Language Model (LLM) applications.
+- loading an evaluation dataset
+- configuring metrics and models
+- building the evaluation index
+- running the RAG pipeline against benchmark queries
+- computing evaluation scores with RAGAS
+
+See the [available RAGAS metrics](https://docs.ragas.io/en/latest/concepts/metrics/available_metrics/).
+
 
 ## 💻 Minimal Example
 
 Here's a step-by-step guide to set up the evaluation pipeline:
 
-### 1. **Create the Evaluator Config File**:
+### 1. Create the evaluator config file
 
 This file defines the evaluation settings for your pipeline.
 
@@ -33,9 +50,10 @@ llm:  # Evaluator LLM config
   llm_name: "gpt-4o"
   max_new_tokens: 150
 ```
-### 2. **Create the Indexer Config File**:
 
-This file configures the indexer for your evaluation.
+### 2. Create the indexer config file
+
+This file configures the indexer during evaluation.
 
 ```yaml
 dense_model_name: sentence-transformers/all-MiniLM-L6-v2
@@ -47,9 +65,9 @@ chunker:
   chunking_strategy: sentence  # Your chunking strategy
 ```
 
-### 3. **Create the RAG Pipeline Config File**:
+### 3. Create the RAG pipeline config file
 
-This file sets up the RAG pipeline for evaluation.
+This file defines the RAG setup to evaluate.
 
 ```yaml
 llm:
@@ -62,7 +80,7 @@ retriever:
   k: 3
 ```
     
-### 4. **Run the Evaluation**:
+### 4. Run the evaluation
 
 Once the configuration files are in place, you can run the evaluation pipeline with the following Python script:
 
@@ -79,5 +97,21 @@ result = evaluator(
 )
 ```
 
-- See [`examples/rag/evaluation`](../examples/rag/evaluation) for a simple example.
-> :warning: Note that you should create a separate database file for each dataset. The pipeline will create partitions per dense model for convenience.
+- See [`examples/rag/evaluation`](../../../examples/rag/evaluation) for a simple example.
+```{warning}
+Create a separate database file for each evaluation dataset.
+
+The pipeline creates partitions per dense model for convenience.
+```
+
+## 📦 Outputs
+
+The evaluation run returns a result object containing the selected metric scores for the evaluated setup.
+
+The exact structure depends on the evaluator configuration and selected metrics.
+
+## See also
+
+- [RAG](../getting_started/rag.md)
+- [Indexing](../getting_started/indexing.md)
+- [Process](../getting_started/process.md)
