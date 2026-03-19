@@ -40,7 +40,7 @@ If you already know the basics, continue with evaluation, multimodal retrieval, 
 ## Documentation map
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Getting started
 
 getting_started/installation
@@ -52,7 +52,7 @@ getting_started/rag
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Core features
 
 core_features/colpali
@@ -62,7 +62,7 @@ core_features/dashboard
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Advanced usage
 
 advanced_usage/distributed_processing
@@ -72,7 +72,7 @@ advanced_usage/rcp_and_production
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Developer documentation
 
 developer_documentation/for_devs

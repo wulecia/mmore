@@ -1,4 +1,4 @@
-# Architecture
+# 🏗️ Architecture
 
 This page gives a high-level view of MMORE and explains how the main components fit together.
 
