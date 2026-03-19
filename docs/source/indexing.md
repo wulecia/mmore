@@ -1,4 +1,4 @@
-# :robot: MMORE Index 
+# :robot: MMORE Indexing 
 
 ## :bulb: TL;DR
 
