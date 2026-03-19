@@ -1,10 +1,12 @@
 # Quickstart
 
+## Overview
+
 This page helps you get MMORE running quickly with a minimal workflow.
 
 The goal is not to cover every configuration option, but to give you a first successful setup and a clear mental model of the main steps.
 
-## What you will do
+## What this quickstart covers
 
 In a typical MMORE workflow, you will:
 
@@ -26,7 +28,7 @@ You should also confirm that:
 
 ## Minimal workflow
 
-The exact commands depend on your repository entry points, but the overall logic is usually the following.
+The exact commands depend on your repository entry points, but the overall workflow is the following.
 
 ### 1. Prepare a small collection
 
@@ -135,9 +137,3 @@ After this page, the best next steps are:
 2. [Processing pipeline](process.md) for ingestion and transformations
 3. [Indexing](indexing.md) for indexing details
 4. [RAG](rag.md) for retrieval-augmented generation
-
-## Notes
-
-This quickstart is intentionally generic so it stays useful even if command-line entry points change.
-
-Once the documentation is stabilized, this page can be enriched with real project-specific commands and a minimal reproducible example from the repository.

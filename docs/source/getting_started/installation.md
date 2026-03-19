@@ -1,20 +1,42 @@
 # Installation
 
-To install `mmore`, run the following:
+## Overview
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/swiss-ai/mmore
-   ```
+This page explains how to install `mmore`.
 
-2. Install the package
-   ```bash
-   pip install -e .
-   ```
+Three installation paths are currently documented:
 
-### Alternative #1: `uv`
+- a standard local installation with `pip`
+- an installation with `uv`
+- a Docker-based setup
 
-##### Step 1: Install system dependencies
+Choose the one that best matches your workflow and environment.
+
+--- 
+## Standard installation
+
+Use this method if you want a straightforward editable local setup.
+
+### Step 1: Clone the repository
+
+```bash
+git clone https://github.com/swiss-ai/mmore
+cd mmore
+```
+
+### Step 2: Install the package
+
+```bash
+pip install -e .
+```
+
+---
+
+## Installation with `uv`
+
+Use this method if you want to manage the environment and dependencies with `uv`.
+
+### Step 1: Install system dependencies
 
 ```bash
 sudo apt update
@@ -24,97 +46,122 @@ sudo apt install -y ffmpeg libsm6 libxext6 chromium-browser libnss3 \
   libpango-1.0-0 libpangoft2-1.0-0 weasyprint
 ```
 
-##### Step 2: Install `uv`
+### Step 2: Install `uv`
 
 Refer to the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for detailed instructions.
-```
+
+```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-##### Step 3: Clone this repository
+### Step 3: Clone the repository
 
 ```bash
 git clone https://github.com/swiss-ai/mmore
 cd mmore
 ```
 
-##### Step 4: Install project and dependencies
+### Step 4: Install the project and dependencies
 
 ```bash
 uv sync
 ```
 
-For CPU-only installation, use:
+For a CPU-only installation, use:
 
 ```bash
 uv sync --extra cpu
 ```
 
-##### Step 5: Run a test command
+### Step 5: Activate the virtual environment
 
-Activate the virtual environment before running commands:
+Before running commands, activate the environment:
 
 ```bash
 source .venv/bin/activate
 ```
-### Alternative #2: `Docker`
 
-**Note:** For manual installation without Docker, refer to the section below.
+---
 
-##### Step 1: Install Docker
+## Installation with Docker
+
+Use this method if you want to run `mmore` in a containerized environment.
+
+### Step 1: Install Docker
 
 Follow the official [Docker installation guide](https://docs.docker.com/get-started/get-docker/).
 
-##### Step 2: Build the Docker image
+### Step 2: Build the Docker image
 
 ```bash
 sudo docker build . --tag mmore
 ```
 
-To build for CPU-only platforms (results in a smaller image size):
+For CPU-only platforms, use:
 
 ```bash
 sudo docker build --build-arg PLATFORM=cpu -t mmore .
 ```
 
-*Running on RCP:* you can specify a `USER_UID` and a `USER_GID` variable. Set it to your RCP user ID and group ID to run it there.
+If you are running on RCP, you can specify `USER_UID` and `USER_GID` variables and set them to your RCP user and group IDs.
 
-##### Step 3: Start an interactive session
+### Step 3: Start an interactive session
+
+For GPU-enabled platforms:
 
 ```bash
 sudo docker run --gpus all -it -v ./examples:/app/examples -v ./.cache:/mmoreuser/.cache mmore
 ```
 
 For CPU-only platforms:
+
 ```bash
 sudo docker run -it -v ./examples:/app/examples -v ./.cache:/mmoreuser/.cache mmore
 ```
 
-> [!WARNING]
-> You may need the Nvidia toolkit so the containers can access your GPUs.
-> Read [this tutorial](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) if something breaks here!
->
-> Configure the production repository:
->
-> ```sh
-> curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
->   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
->   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
->   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-> ```
->
-> ```sh
-> sudo apt update
-> sudo apt install -y nvidia-container-toolkit
-> ```
->
-> Modify the Docker daemon to use Nvidia:
->
-> ```sh
-> sudo nvidia-ctk runtime configure --runtime=docker
-> sudo systemctl restart docker
-> ```
->
-> You can now use `docker run --gpus all`!
+```{warning}
+You may need the Nvidia container toolkit for Docker containers to access your GPU.
+If GPU execution does not work, refer to the official Nvidia container toolkit installation guide:
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+```
 
-*Note:* The `examples` folder is mapped to `/app/examples` inside the container, corresponding to the default path in `examples/process/config.yaml`.
+To configure the production repository:
+
+```sh
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+```
+
+```sh
+sudo apt update
+sudo apt install -y nvidia-container-toolkit
+```
+
+Then configure Docker to use the Nvidia runtime:
+
+```sh
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+```
+
+You can then use:
+
+```sh
+docker run --gpus all
+```
+
+---
+
+## Notes
+
+The `examples` folder is mapped to `/app/examples` inside the container. This corresponds to the default path used in `examples/process/config.yaml`.
+
+For a manual non-Docker setup, use either the standard installation or the `uv` workflow described above.
+
+## See also
+
+- [Quickstart](quickstart.md)
+- [Process](process.md)
+- [uv workflow](../advanced/uv.md)

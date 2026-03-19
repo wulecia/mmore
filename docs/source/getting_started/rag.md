@@ -1,107 +1,134 @@
-# :robot: MMORE RAG 
+# 🤖 MMORE RAG 
 
-## :bulb: TL;DR
+## Overview
 
-> The `RAG` module enables the creation of a modular RAG inference pipeline for your indexed multimodal documents, using two inference modes:
-> 1. **API**: Creates a server hosting the pipeline
-> 2. **Local**: Runs the inference locally (:warning: might be long when running local models :warning:) 
-> 
-> You can customize various parts of the pipeline by defining [an inference RAG configuration file](/examples/rag/api/rag_api.yaml).
+The `rag` module enables the creation of a modular RAG inference pipeline for indexed multimodal documents.
 
-## :computer: Minimal Example:
+It supports two inference modes:
+
+1. **API**: runs a server hosting the pipeline
+2. **Local**: runs inference locally
+
+Different parts of the pipeline can be customized through a RAG inference configuration file.
+
+## 💡 TL;DR
+
+The RAG module lets you combine retrieval and generation over indexed multimodal documents.
+
+In practice, it supports:
+
+- a local inference mode
+- an API mode for serving the pipeline
+- configurable retriever and LLM components
+- optional WebRAG and CLI usage in local mode
+
+You can customize various parts of the pipeline by defining [an inference RAG configuration file](../../../examples/rag/api/rag_api.yaml).
+
+## 💻 Minimal Example:
 
 Here is a minimal example to create a RAG pipeline hosted through [LangGraph](https://python.langchain.com/docs/langgraph/) servers.
 
-1. Create your RAG Inference config file based on the [local example](/examples/rag/config.yaml) or the [API example](/examples/rag/config_api.yaml). You can check the structure of the configuration file with the dataclass [RAGConfig](/src/mmore/rag/pipeline.py).
+### 1. Create a RAG inference config file
 
-2. Start your RAG pipeline using the `run_rag.py` script and your config file
-    ```bash
-    python3 -m mmore rag --config_file /path/to/config.yaml
-    ```
+Create your RAG Inference config file based on the [local example](../../../examples/rag/config.yaml) or the [API example](../../../examples/rag/config_api.yaml).  
+You can check the structure of the configuration file with the dataclass [RAGConfig](../../../src/mmore/rag/pipeline.py).
 
-3. In API mode, query the server like any other LangGraph server:
-    ```bash
-    curl --location --request POST http://localhost:8000/rag/invoke \
-    -H 'Content-Type: application/json' \
-    -d '{
-        "input": {
-            "input": "What is Meditron?",
-            "collection_name": "my_docs"
-        }
-    }'
-    ```
+### 2. Start the RAG pipeline
 
-    ```bash
-    curl --location --request GET http://localhost:8000/rag/input_schema \
-    -H 'Content-Type: application/json' 
-    ```
+Start your RAG pipeline using the `run_rag.py` script and your config file
+```bash
+python3 -m mmore rag --config_file /path/to/config.yaml
+```
 
-    In local mode, the pipeline is run directly with the input data specified in the configuration file and the result is saved at the specified path.
+### 3. Query the server in API mode
+In API mode, query the server like any other LangGraph server:
 
-See [`examples/rag`](/examples/rag/) for other use cases.
+```bash
+curl --location --request POST http://localhost:8000/rag/invoke \
+-H 'Content-Type: application/json' \
+-d '{
+    "input": {
+        "input": "What is Meditron?",
+        "collection_name": "my_docs"
+    }
+}'
+```
 
-## :mag: Modules
+```bash
+curl --location --request GET http://localhost:8000/rag/input_schema \
+-H 'Content-Type: application/json' 
+```
 
-The RAG decomposes into two main modules:
+In local mode, the pipeline is run directly with the input data specified in the configuration file and the result is saved at the specified path.
+
+See [`examples/rag`](../../../examples/rag/) for other use cases.
+
+## 🔎 Main modules
+
+The RAG pipeline is built around two main modules:
 1. The `Retriever`, which retrieves multimodal documents from the database. 
 2. The `LLM`, which wraps different types of multimodal-able LLMs.
 
-#### Retriever
+### Retriever
 
-Here is an example on how to use the retriever module alone. Note that it assumes that you already created a DB using [the indexer module](index.md).
+Here is an example on how to use the retriever module on its own. Note that it assumes that you already created a database using the [Indexing](indexing.md) workflow.
 
-1. Create a config based on the [example config file](/examples/index/config.yaml)
+#### 1. Create a config
 
-2. Retrieve on the vector store using the `Retriever` class:
-    ```python
-    from mmore.rag.retriever import Retriever
+Start from the [example config file](../../../examples/index/config.yaml).
 
-    # Create the Retriever
-    retriever = Retriever.from_config('/path/to/your/retriever_config.yaml')
+#### 2. Retrieve from the vector store
 
-    # Retrieves the top 3 documents using an hybrid approach (e.g. dense + sparse embeddings)
-    retriever.retrieve(
-        'What is Meditron?',
-        k=3,
-        collection_name="my_docs",
-        search_type="hybrid"  # Options: "dense", "sparse", "hybrid"
-    )
-    ```
+```python
+from mmore.rag.retriever import Retriever
 
-#### LLM
+# Create the Retriever
+retriever = Retriever.from_config('/path/to/your/retriever_config.yaml')
 
-Here is an example on how to use the `LLM` module alone. Note that it assumes that you already created a DB using [the indexer module](index.md).
+# Retrieves the top 3 documents using an hybrid approach (e.g. dense + sparse embeddings)
+retriever.retrieve(
+    'What is Meditron?',
+    k=3,
+    collection_name="my_docs",
+    search_type="hybrid"  # Options: "dense", "sparse", "hybrid"
+)
+```
 
-1. Create a config file:
-    ```yaml
-    llm_name: gpt-4o-mini
-    max_new_tokens: 150
-    temperature: 0.7
-    ```
+### LLM
 
-2. Query the LLM:
-    ```python
-    from mmore.rag.llm import LLM
+Here is an example on how to use the `LLM` module on its own. This also assumes that the indexing workflow has already been completed.
 
-    # Create the LLM
-    llm = LLM.from_config('/path/to/your/llm_config.yaml')
+#### 1. Create a config file
+```yaml
+llm_name: gpt-4o-mini
+max_new_tokens: 150
+temperature: 0.7
+```
 
-    # Create your messages
-    messages = [
-    (
-        "system",
-        "You are a helpful assistant that translates English to French. Translate the user sentence.",
-    ),
-    (
-        "human",
-        "I love Meditron."
-    ),
-    ]
+#### 2. Query the LLM
+```python
+from mmore.rag.llm import LLM
 
-    # Retrieves the top 3 documents using an hybrid approach (e.g. dense + sparse embeddings)
-    llm.invoke(messages)
-    ```
-## :wrench: Customization
+# Create the LLM
+llm = LLM.from_config('/path/to/your/llm_config.yaml')
+
+# Create your messages
+messages = [
+(
+    "system",
+    "You are a helpful assistant that translates English to French. Translate the user sentence.",
+),
+(
+    "human",
+    "I love Meditron."
+),
+]
+
+# Retrieves the top 3 documents using an hybrid approach (e.g. dense + sparse embeddings)
+llm.invoke(messages)
+```
+
+## 🔧 Customization
 
 Our RAG pipeline is built to take full advantage of [LangChain](https://python.langchain.com/docs/introduction/) abstractions, providing compatibility with all components offered.
 
@@ -110,18 +137,46 @@ Our RAG pipeline is built to take full advantage of [LangChain](https://python.l
 Our retriever is a LangChain [`BaseRetriever`](https://python.langchain.com/api_reference/core/retrievers/langchain_core.retrievers.BaseRetriever.html). If you want to create a custom retriever (e.g. GraphRetriever,...) you can simply make it inherit from this class and use it as described in our examples.
 
 #### WebRAG (only in local mode at the moment)
-When doing RAG in local mode, one can use WebRAG - the [`DuckDuckGo Search API`](https://python.langchain.com/docs/integrations/tools/ddg/) is used to search the web using the query and adds its results to the context. 
+WebRAG is currently available in local mode only.
 
-#### CLI for RAG (only in local mode at the moment)
-A user-friendly CLI for RAG. Start your RAG CLI using the `run_ragcli.py` script and your config file
+It uses the [`DuckDuckGo Search API`](https://python.langchain.com/docs/integrations/tools/ddg/) to search the web using the input query, then adds its results to the context. 
+
+#### CLI for RAG 
+A CLI is also available in local mode.
+
+Start it with:
+
 ```bash
 python3 -m mmore ragcli --config_file /path/to/config.yaml
 ```
 
-You can customize the CLI by defining [a RAG configuration file](/examples/rag/config.yaml) or by setting preferences from within the CLI.
+You can customize the CLI by defining [a RAG configuration file](../../../examples/rag/config.yaml) or by setting preferences from within the CLI.
 
 #### LLM
+The LLM wrappers are based on LangChain's [`BaseChatModel`](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.chat_models.BaseChatModel.html). 
 
-Our LLMs are LangChain's [`BaseChatModel`](https://python.langchain.com/api_reference/core/retrievers/langchain_core.retrievers.BaseRetriever.html) base class. If you want to create a custom retriever you can simply make it inherit from this class and use it as described in our examples. 
+If you want to create a custom retriever you can simply make it inherit from this class and use it as described in our examples. 
 
-> :warning: Note that we support [HuggingFace Hub](https://huggingface.co/models) models, so a simpler solution is to push a model to the hub and use the class as defined.
+```{warning}
+MMORE supports [Hugging Face Hub](https://huggingface.co/models) models.
+
+In some cases, a simpler solution is to push a model to the Hub and use it through the existing class rather than implementing a new wrapper.
+```
+
+## Notes
+
+API mode and local mode do not behave in exactly the same way.
+
+In particular:
+
+- WebRAG is currently available only in local mode
+- the CLI is currently available only in local mode
+- local inference may be slow when using local models
+
+## See also
+
+- [Indexing](indexing.md)
+- [Process](process.md)
+- [Architecture](architecture.md)
+
+
