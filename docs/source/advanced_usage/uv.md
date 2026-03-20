@@ -1,6 +1,12 @@
-# Use `uv` to install `mmore`
+# ⚡ `uv`
+Use `uv` to install `mmore`
 
-`uv` is an extremely fast Python package and project manager, written in Rust. It can act as a wrapper around `pip` to speedup the installations.
+## Overview
+
+`uv` is an extremely fast Python package and project manager, written in Rust. 
+
+It can be used as a replacement or wrapper around `pip` to speed up the installation and environment management.
+
 
 <p align="center">
   <picture align="center">
@@ -10,29 +16,42 @@
   </picture>
 </p>
 
-# Install `uv`
+## 📦 Install `uv`
 
-Install uv with the standalone installers:
+Install `uv` with the standalone installers.
+
+### macOS and Linux
 
 ```bash
-# On macOS and Linux.
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
+### Windows
+
 ```bash
-# On Windows.
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-## Install `mmore` with `uv`
-First create a new venv at repo's location
+## 🛠️ Install `mmore` with `uv`
+First create a virtual environment at the repository location:
 ```bash
 uv venv
 source .venv/bin/activate
 ```
 
-Then install mmore prepending `uv` to basic commands
+Then install `mmore` by using `uv` with the usual `pip` command:
+
 ```bash
 uv pip install -e .
 ```
 
+
+## Notes
+
+Using `uv` is an alternative to a standard `pip`-based installation.
+
+It can be useful when you want faster dependency installation or a more streamlined environment setup.
+
+## See also
+
+- [Installation](../getting_started/installation.md)
