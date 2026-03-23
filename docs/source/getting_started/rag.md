@@ -1,13 +1,13 @@
-# 🤖 MMORE RAG 
+# 🤖 RAG 
 
 ## Overview
 
 The `rag` module enables the creation of a modular RAG inference pipeline for indexed multimodal documents.
 
-It supports two inference modes:
+It supports two main execution modes:
 
-1. **API**: runs a server hosting the pipeline
-2. **Local**: runs inference locally
+1. **API mode**: runs the pipeline as a server and exposes an API
+2. **Batch mode**: runs inference from an input file of queries, for example a JSONL file
 
 Different parts of the pipeline can be customized through a RAG inference configuration file.
 
@@ -17,12 +17,15 @@ The RAG module lets you combine retrieval and generation over indexed multimodal
 
 In practice, it supports:
 
-- a local inference mode
+- a batch mode for file-based inference
 - an API mode for serving the pipeline
 - configurable retriever and LLM components
-- optional WebRAG and CLI usage in local mode
+- optional WebRAG and CLI usage in batch mode
 
-You can customize various parts of the pipeline by defining [an inference RAG configuration file](../../../examples/rag/api/rag_api.yaml).
+You can customize various parts of the pipeline by defining an inference RAG configuration file at
+[`examples/rag/api/rag_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/api/rag_api.yaml).
+
+
 
 ## 💻 Minimal Example:
 
@@ -30,7 +33,7 @@ Here is a minimal example to create a RAG pipeline hosted through [LangGraph](ht
 
 ### 1. Create a RAG inference config file
 
-Create your RAG Inference config file based on the [local example](../../../examples/rag/config.yaml) or the [API example](../../../examples/rag/config_api.yaml).  
+Create your RAG Inference config file based on the [batch example](../../../examples/rag/config.yaml) or the [API example](../../../examples/rag/config_api.yaml).  
 You can check the structure of the configuration file with the dataclass [RAGConfig](../../../src/mmore/rag/pipeline.py).
 
 ### 2. Start the RAG pipeline
@@ -58,8 +61,7 @@ curl --location --request POST http://localhost:8000/rag/invoke \
 curl --location --request GET http://localhost:8000/rag/input_schema \
 -H 'Content-Type: application/json' 
 ```
-
-In local mode, the pipeline is run directly with the input data specified in the configuration file and the result is saved at the specified path.
+In batch mode, the pipeline is run directly with the input data specified in the configuration file, and the result is saved to the specified path.
 
 See [`examples/rag`](../../../examples/rag/) for other use cases.
 
@@ -137,12 +139,12 @@ Our RAG pipeline is built to take full advantage of [LangChain](https://python.l
 Our retriever is a LangChain [`BaseRetriever`](https://python.langchain.com/api_reference/core/retrievers/langchain_core.retrievers.BaseRetriever.html). If you want to create a custom retriever (e.g. GraphRetriever,...) you can simply make it inherit from this class and use it as described in our examples.
 
 #### WebRAG (only in local mode at the moment)
-WebRAG is currently available in local mode only.
+WebRAG is currently available in batch mode only.
 
 It uses the [`DuckDuckGo Search API`](https://python.langchain.com/docs/integrations/tools/ddg/) to search the web using the input query, then adds its results to the context. 
 
 #### CLI for RAG 
-A CLI is also available in local mode.
+A CLI is also available in batch mode.
 
 Start it with:
 
@@ -165,13 +167,13 @@ In some cases, a simpler solution is to push a model to the Hub and use it throu
 
 ## Notes
 
-API mode and local mode do not behave in exactly the same way.
+API mode and batch mode do not behave in exactly the same way.
 
 In particular:
 
-- WebRAG is currently available only in local mode
-- the CLI is currently available only in local mode
-- local inference may be slow when using local models
+- WebRAG is currently available only in batch mode
+- the CLI is currently available only in batch mode
+- batch inference may be slow when using local models
 
 ## See also
 

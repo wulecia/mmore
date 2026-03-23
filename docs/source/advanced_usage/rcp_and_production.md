@@ -1,6 +1,8 @@
-# 🚀 RCP and Production Deployment
+# 🚀 Cluster and Production Deployment
 
-This document provides comprehensive guidelines for deploying MMORE on the RCP and, later, in production.
+This page provides guidelines for deploying MMORE in a shared cluster environment and, if needed, adapting it for production deployment.
+
+The examples below assume a Run:ai-based cluster setup with a shared persistent volume. You may need to adapt paths, scheduler options, and environment variables to match your infrastructure.
 
 ## 🐳 Docker Image Requirements
 
@@ -8,7 +10,7 @@ This document provides comprehensive guidelines for deploying MMORE on the RCP a
 Build your own Docker image with your specific user ID and group ID to avoid permission issues in the production environment.
 ```
 
-### 1. Check your user and group IDs on the RCP
+### 1. Check your user and group IDs on the cluster
 ```bash
 id -u  # Your user ID
 id -g  # Your group ID
@@ -36,39 +38,41 @@ docker push docker.io/username/mmore:latest
 
 For detailed installation instructions, see [Installation](../getting_started/installation.md).
 
-## 🖥️ Running on the RCP
+## 🖥️ Running on a cluster
 
 ### Environment setup
 
-First, define the main environment variables:
+First, define the main environment variables used for input and output data.
 
 ```bash
-export ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out
-export ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in
+export ROOT_OUT_DIR=/shared/users/$USER/mmore-data/out
+export ROOT_IN_DIR=/shared/users/$USER/mmore-data/in
 ```
 
 ### Directory structure initialization
 
-Create the required directory structure on the persistent volume:
+Create the required directory structure on the shared storage volume:
 
 ```bash
-mkdir -p /lightscratch/users/$GASPAR/mmore-data/in
-mkdir -p /lightscratch/users/$GASPAR/mmore-data/out
-mkdir -p /lightscratch/users/$GASPAR/mmore-data/out/db
-mkdir -p /lightscratch/users/$GASPAR/mmore-data/out/process/outputs/images
-mkdir -p /lightscratch/users/$GASPAR/mmore-data/in/sample_data/
+mkdir -p $ROOT_IN_DIR
+mkdir -p $ROOT_OUT_DIR
+mkdir -p $ROOT_OUT_DIR/db
+mkdir -p $ROOT_OUT_DIR/process/outputs/images
+mkdir -p $ROOT_IN_DIR/sample_data
 ```
 
 ## 💻 Interactive Development Session
 
-For development, debugging, or manual operations, start an interactive session.  
-Replace `<group-id>` with your actual group ID and `username` with your DockerHub username.
+For development, debugging, or manual operations, you can start an interactive session on the cluster.
+
+The example below assumes a Run:ai-based environment. Replace `username`, `<group-id>`, storage mounts, and node configuration with values that match your setup.
 
 ```bash
-runai submit swissaimmore \
+runai submit \
+  --name mmore-dev \
   --image docker.io/username/mmore:latest \
   --node-pool h100 \
-  --pvc light-scratch:/lightscratch \
+  --pvc shared-storage:/shared \
   --gpu 1 \
   --run-as-gid <group-id> \
   --preemptible \
@@ -82,7 +86,8 @@ This provides a direct terminal access to the container.
 
 ## ⚙️ Production Pipeline Execution
 
-For production workloads, submit jobs that run specific pipeline stages:
+The following examples show how to submit MMORE pipeline stages as cluster jobs in a Run:ai-based environment.  
+Adapt resource settings, storage mounts, paths, and scheduler flags to your infrastructure.
 
 ### 1. Document Processing
 
@@ -90,16 +95,16 @@ Process raw documents and extract multimodal content.
 Replace `<group-id>` with your actual group ID and `username` with your DockerHub username.
 
 ```bash
-runai submit \ 
-  --name swissaimmore-process \ 
-  --image docker.io/username/mmore:latest \ 
-  --backoff-limit 0 \ 
-  --pvc light-scratch:/lightscratch \ 
-  --run-as-gid <group-id> \ 
-  --node-pool h100 \ 
-  --gpu 1 \ 
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \ 
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \ 
+runai submit \
+  --name mmore-process \
+  --image docker.io/username/mmore:latest \
+  --backoff-limit 0 \
+  --pvc shared-storage:/shared \
+  --run-as-gid <group-id> \
+  --node-pool h100 \
+  --gpu 1 \
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
   --command "python3 -m mmore process --config-file production-config/process/config.yaml"
 ```
 
@@ -108,17 +113,17 @@ runai submit \
 Clean and structure the extracted data.
 
 ```bash
-runai submit \ 
-  --name swissaimmore-postprocess \ 
-  --image docker.io/username/mmore:latest \ 
-  --backoff-limit 0 \ 
-  --pvc light-scratch:/lightscratch \ 
-  --run-as-gid <group-id> \ 
-  --node-pool h100 \ 
-  --gpu 1 \ 
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \ 
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \ 
-  --command "python3 -m mmore postprocess --config-file production-config/postprocessor/config.yaml --input-data /lightscratch/users/$GASPAR/mmore-data/out/process/outputs/merged/merged_results.jsonl"
+runai submit \
+  --name mmore-postprocess \
+  --image docker.io/username/mmore:latest \
+  --backoff-limit 0 \
+  --pvc shared-storage:/shared \
+  --run-as-gid <group-id> \
+  --node-pool h100 \
+  --gpu 1 \
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  --command "python3 -m mmore postprocess --config-file production-config/postprocessor/config.yaml --input-data $ROOT_OUT_DIR/process/outputs/merged/merged_results.jsonl"
 ```
 
 ### 3. Vector indexing
@@ -126,17 +131,17 @@ runai submit \
 Create searchable vector indexes.
 
 ```bash
-runai submit \ 
-  --name swissaimmore-index \ 
-  --image docker.io/username/mmore:latest \ 
-  --backoff-limit 0 \ 
-  --pvc light-scratch:/lightscratch \ 
-  --run-as-gid 84257 \ 
-  --node-pool h100 \ 
-  --gpu 1 \ 
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \ 
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \ 
-  --command "python3 -m mmore index --config-file production-config/index/config.yaml --documents-path /lightscratch/users/$GASPAR/mmore-data/out/postprocessor/outputs/merged/final_pp.jsonl"
+runai submit \
+  --name mmore-index \
+  --image docker.io/username/mmore:latest \
+  --backoff-limit 0 \
+  --pvc shared-storage:/shared \
+  --run-as-gid <group-id> \
+  --node-pool h100 \
+  --gpu 1 \
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  --command "python3 -m mmore index --config-file production-config/index/config.yaml --documents-path $ROOT_OUT_DIR/postprocessor/outputs/merged/final_pp.jsonl"
 ```
 
 ### 4. RAG Service Deployment
@@ -144,17 +149,17 @@ runai submit \
 Deploy the retrieval API service.
 
 ```bash
-runai submit \ 
-  --name swissaimmore-rag \ 
-  --image docker.io/username/mmore:latest \ 
-  --backoff-limit 0 \ 
-  --pvc light-scratch:/lightscratch \ 
-  --run-as-gid <group-id> \ 
-  --node-pool h100 \ 
-  --gpu 1 \ 
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \ 
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \ 
-  -e HF_TOKEN=$HF_TOKEN \ 
+runai submit \
+  --name mmore-rag \
+  --image docker.io/username/mmore:latest \
+  --backoff-limit 0 \
+  --pvc shared-storage:/shared \
+  --run-as-gid <group-id> \
+  --node-pool h100 \
+  --gpu 1 \
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  -e HF_TOKEN=$HF_TOKEN \
   --command "python3 -m mmore live-retrieval --config-file production-config/retriever_api/config.yaml"
 ```
 

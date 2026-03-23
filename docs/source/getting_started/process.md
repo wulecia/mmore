@@ -19,9 +19,37 @@ python3 -m mmore process --config-file examples/process/config.yaml
 ### 📌 Google Drive support
 MMORE also supports processing documents directly from **Google Drive**.
 
-To enable this feature, the user must create a [Google service account](https://cloud.google.com/iam/docs/service-accounts-create) and download the corresponding secrets as a JSON file. Name that file `client_secrets.json` put it in `googledrive/` (this folder may need to be created at the root of the mmore repository).
+To enable this feature, the user must create a [Google service account](https://cloud.google.com/iam/docs/service-accounts-create) and download the corresponding secrets as a JSON file. Name that file `client_secrets.json` and put it in `googledrive/` (this folder may need to be created at the root of the mmore repository).
 
 Make sure your **Google service account** has permission to view the drives you want to process.
+
+#### Referencing Google Drive sources
+
+Google Drive folders are referenced in the process config file through the `google_drive_ids` field.
+
+For example:
+
+```yaml
+data_path: examples/sample_data/ # Put absolute path ! Possible to pass a list of folders 
+google_drive_ids: [] # Put ids of Google Drive folders
+```
+- `data_path` is used for local input folder
+- `google_drive_ids` is used to provide one or more Google Drive folder IDs to process
+
+To process documents from Google Drive, add the folder IDs to the list:
+```yaml
+data_path: examples/sample_data/
+google_drive_ids:
+  - your_google_drive_folder_id
+  - another_google_drive_folder_id
+```
+
+You can use local folders, Google Drive folders, or both in the same configuration.
+
+Make sure each referenced Google Drive folder is shared with the service account used by MMORE.
+
+You can find an example config file in [`examples/process/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/process/config.yaml).
+
 
 ### 📂 Output structure
 
@@ -72,11 +100,6 @@ For some file types, we provide a fast mode that will allow you to process the f
 
 Be aware that the fast mode might not be as accurate as the default mode, especially for scanned non-native PDFs, which may require Optical Character Recognition (OCR) for more accurate extraction.
 
-### 🚀 Distributed mode
-
-MMORE is designed to scale to multi-GPU and multi-node environments.
-
-To enable distributed execution, set `distributed` to `true` in the config file, then follow the steps described in [Distributed processing](../advanced_usage/distributed_processing.md).
 
 ### 🔧 File type parameters tuning
 
@@ -90,6 +113,8 @@ For example, you can tune:
 You can configure parameters by providing a custom config file. You can find an example of a config file in the [examples folder](../../../examples/process/config.yaml).
 
 ⚠️ Not all parameters are configurable yet.
+
+For distributed execution options, see the [Quick Start](quickstart.md) and [Distributed processing](../advanced_usage/distributed_processing.md).
 
 ## 📜 More information on what's under the hood
 
@@ -135,20 +160,20 @@ The system is designed to be extensible, allowing you to register custom process
 - `accepts`: defines which file types your processor supports (e.g. docx)
 - `process`: how to process a single file (input:file type, output: Multimodal sample, see other processors for reference)
 
-For a minimal example, see `TextProcessor` in `src/process/processors/text_processor.py`.
+For a minimal example, see [`TextProcessor`](https://github.com/swiss-ai/mmore/blob/master/src/mmore/process/processors/txt_processor.py).
 
 ## 🧹 Post-processing
 
 Post-processing refines the extracted text data to improve quality for downstream tasks. The infrastructure is modular and extensible: mmore natively supports the following post-processors: 
 
-- [Chunker](/src/mmore/process/post_processor/chunker)
-- [Filter](/src/mmore/process/post_processor/filter)
-- [Named Entity Recognition](/src/mmore/process/post_processor/ner)
-- [Tagger](/src/mmore/process/post_processor/tagger)
+- [`Chunker`](https://github.com/swiss-ai/mmore/blob/master/src/mmore/process/post_processor/chunker)
+- [`Filter`](https://github.com/swiss-ai/mmore/blob/master/src/mmore/process/post_processor/filter)
+- [`Named Entity Recognition`](https://github.com/swiss-ai/mmore/blob/master/src/mmore/process/post_processor/ner)
+- [`Tagger`](https://github.com/swiss-ai/mmore/blob/master/src/mmore/process/post_processor/tagger)
 
 Applying the **Chunker** is heavily recommended, as it cuts documents into reasonably sized chunks that are more specific to feed to an LLM.  
 
-You can configure parameters by providing a custom config file. You can find an example of a config file in the [examples folder](../../../examples/postprocessor/config.yaml).
+You can configure parameters by providing a custom config file. This field is shown in the example config file at [`examples/process/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/process/config.yaml).
 
 
 Once ready, you can run the process using the following command:

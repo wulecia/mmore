@@ -4,9 +4,22 @@ This page gives a high-level view of MMORE and explains how the main components 
 
 It is meant to help readers understand the system before diving into implementation details.
 
+![MMORE architecture](../doc_images/general_pipeline_mmore.png)
+
+*High-level overview of the MMORE pipeline, from processing and indexing to retrieval and RAG workflows.*
+
+
 ## Overview
 
 MMORE is designed as a multimodal ingestion and retrieval framework for heterogeneous document collections.
+
+MMORE is organized around three main executable stages:
+
+- `run_process`, which handles ingestion, crawling, dispatching, and document processing
+- `run_indexer`, which builds the searchable index and can integrate multimodal retrieval components such as ColPali
+- `run_rag`, which serves retrieval and RAG workflows through interfaces such as the API and CLI
+
+These stages interact with intermediate outputs, the vector database, and optional external components such as hosted LLM endpoints, WebRAG, or Live RAG.
 
 At a high level, the system follows a pipeline like this:
 
@@ -97,14 +110,15 @@ See [ColPali](../core_features/colpali.md) for the multimodal retrieval side.
 
 ### 6. Distributed execution
 
-For larger workloads, MMORE can scale through distributed processing.
+### 6. Distributed processing
+
+For larger workloads, MMORE supports distributed execution in the processing stage.
 
 This is useful when:
 
-- the collection is large
-- processing is computationally expensive
-- indexing or retrieval must be parallelized
-- experiments need to run over multiple jobs or nodes
+- the input collection is large
+- document processing is computationally expensive
+- ingestion needs to be parallelized across multiple jobs or nodes
 
 See [Distributed processing](../advanced_usage/distributed_processing.md).
 
@@ -119,15 +133,6 @@ Two complementary concerns matter here:
 
 See [Evaluation](../core_features/evaluation.md) and [Profiler](../advanced_usage/profiler.md).
 
-## Reader-oriented map
-
-Depending on what you want to do, start in different places:
-
-- to **use MMORE**, start with [Quickstart](quickstart.md) and [Installation](installation.md)
-- to **understand the pipeline**, read [Processing pipeline](process.md), [Indexing](indexing.md), and [RAG](rag.md)
-- to **work on multimodal retrieval**, read [ColPali](../core_features/colpali.md)
-- to **run at scale**, read [Distributed processing](../advanced_usage/distributed_processing.md)
-- to **contribute to the codebase**, read [For developers](../developer_documentation/for_devs.md)
 
 ## Design principles
 

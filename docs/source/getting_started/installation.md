@@ -4,11 +4,12 @@
 
 This page explains how to install MMORE.
 
-Three installation paths are currently documented:
+Four installation paths are currently documented:
 
-- a standard local installation with `pip`
-- an installation with `uv`
-- a Docker-based setup
+- installation standard from PyPI with `pip`
+- installation from the source repository with `pip install -e .`
+- installation with `uv`
+- Docker-based setup
 
 Choose the one that best matches your workflow and environment.
 
@@ -36,12 +37,24 @@ export OPENAI_API_KEY="your_openai_api_key"
 ### Notes
 - These environment variables must be set in your shell before launching MMORE commands.
 -	If you run MMORE in Docker, make sure the variables are passed to the container as well.
-- If you run MMORE on the RCP or in production, make sure they are available in the job environment.
+- If you run MMORE on a cluster or in production, make sure these variables are available in the job environment.
 
+
+--- 
 
 ## Standard installation
 
-Use this method if you want a straightforward editable local setup.
+Use this method if you want to install MMORE directly from PyPI.
+
+### Install MMORE
+
+```bash
+pip install mmore
+```
+
+## Installation from the source repository
+
+Use this method if you want to work from the GitHub repository, modify the code, or contribute to MMORE.
 
 ### Step 1: Clone the repository
 
@@ -60,7 +73,7 @@ pip install -e .
 
 ## Installation with `uv`
 
-Use this method if you want to manage the environment and dependencies with `uv`.
+Use this method if you want to install MMORE from source while managing the environment and dependencies with `uv`.
 
 ### Step 1: Install system dependencies
 
@@ -129,7 +142,7 @@ For CPU-only platforms, use:
 sudo docker build --build-arg PLATFORM=cpu -t mmore .
 ```
 
-If you are running on RCP, you can specify `USER_UID` and `USER_GID` variables and set them to your RCP user and group IDs.
+If you are running on a shared cluster environment, you can specify `USER_UID` and `USER_GID` variables and set them to your user and group IDs.
 
 ### Step 3: Start an interactive session
 
@@ -190,4 +203,4 @@ For a manual non-Docker setup, use either the standard installation or the `uv` 
 
 - [Quickstart](quickstart.md)
 - [Process](process.md)
-- [uv workflow](../advanced/uv.md)
+- [uv workflow](../advanced_usage/uv.md)

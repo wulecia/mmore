@@ -1,4 +1,4 @@
-# 🗂️ MMORE Indexing 
+# 🗂️ Indexing 
 
 ## Overview
 

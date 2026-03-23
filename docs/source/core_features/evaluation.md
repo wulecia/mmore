@@ -1,4 +1,4 @@
-# 📊 MMORE RAG Evaluation Pipeline
+# 📊 RAG Evaluation Pipeline
 
 ## Overview
 
