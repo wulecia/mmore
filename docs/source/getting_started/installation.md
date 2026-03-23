@@ -2,7 +2,7 @@
 
 ## Overview
 
-This page explains how to install `mmore`.
+This page explains how to install MMORE.
 
 Three installation paths are currently documented:
 
@@ -13,6 +13,32 @@ Three installation paths are currently documented:
 Choose the one that best matches your workflow and environment.
 
 --- 
+
+## API keys and environment variables
+
+Some MMORE features require API keys or access tokens.
+
+### Hugging Face
+
+If you use Hugging Face hosted services or models, set your token in the `HF_TOKEN` environment variable before running MMORE:
+
+```bash
+export HF_TOKEN="your_huggingface_token"
+```
+
+### Hosted LLM providers
+If you use a hosted LLM provider, make sure the corresponding API key is available in your environment before running MMORE.
+
+For example, with OpenAI:
+```bash
+export OPENAI_API_KEY="your_openai_api_key"
+```
+### Notes
+- These environment variables must be set in your shell before launching MMORE commands.
+-	If you run MMORE in Docker, make sure the variables are passed to the container as well.
+- If you run MMORE on the RCP or in production, make sure they are available in the job environment.
+
+
 ## Standard installation
 
 Use this method if you want a straightforward editable local setup.
@@ -85,7 +111,7 @@ source .venv/bin/activate
 
 ## Installation with Docker
 
-Use this method if you want to run `mmore` in a containerized environment.
+Use this method if you want to run MMORE in a containerized environment.
 
 ### Step 1: Install Docker
 
