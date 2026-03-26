@@ -16,10 +16,10 @@ It supports two inference modes:
 1. **API**: runs a server hosting the pipeline
 2. **Local**: runs the inference locally
  
-You can customize various parts of the pipeline by defining a WebSearch inference configuration file such as [`examples/websearch/config_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config_api.yaml).
+You can customize various parts of the pipeline by defining a WebSearch inference configuration file such as [`examples/websearch/config_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config_api.yaml).
 
 
-Users can also adjust the pipeline through parameters defined in files such as [`examples/websearch/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config.yaml).
+Users can also adjust the pipeline through parameters defined in files such as [`examples/websearch/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config.yaml).
 
 Main parameters include:
 
@@ -54,7 +54,7 @@ Here is a example to create a Websearch pipeline hosted through [LangGraph](http
 
 ### 1. Create a config file
 
-Start from the [local example](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config.yaml) or the [API example](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config_api.yaml).
+Start from the [local example](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config.yaml) or the [API example](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config_api.yaml).
 
 ### 2. Start the WebSearch pipeline
 
