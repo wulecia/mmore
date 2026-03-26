@@ -63,7 +63,7 @@ milvus:
 
 ### 3. Run Retrieval
 
-#### API Mode (recommended)
+#### Retrieval Server Mode
 ```bash
 # Start the retrieval API server
 python3 -m mmore colpali retrieve --config-file examples/colpali/config_retrieval.yml
@@ -88,8 +88,8 @@ text_parquet_path: "./output/pdf_page_text.parquet"
 
 #### Single Query Mode
 ```bash
-# Run a single query
-python3 -m src.mmore.colpali.run_retriever --config_file examples/colpali/config_retrieval_single.yml
+# Run retrieval for a single query defined in the config file
+python3 -m mmore colpali retrieve --config-file examples/colpali/config_retrieval_single.yml
 ```
 
 **Example config (`config_retrieval_single.yml`):**
@@ -157,7 +157,7 @@ text_parquet_path: "./output/pdf_page_text.parquet"
 4. Store results in Parquet format
 
 ### Retriever
-- supports multiple modes: API mode by default, or batch mode with `--input-file` and `--output-file`
+- supports multiple usage modes: server mode by default, single-query mode via config, or batch mode with `--input-file` and `--output-file`
 - performs fast semantic search with reranking
 - exposes a REST API for integration
 - supports configurable top-k results
@@ -222,18 +222,21 @@ The `ColPaliRetriever` is a LangChain-compatible `BaseRetriever` that returns `D
 
 ### Process Output
 
-**Embeddings Parquet (`pdf_page_objects.parquet`):**
-```parquet
-pdf_path | page_number | embedding
----------|-------------|-----------
-/path/to/doc1.pdf | 1 | [0.1, 0.2, ...]
+**Embeddings Parquet (`pdf_page_objects.parquet`)**
+```json
+{
+  "pdf_path": "/path/to/doc1.pdf",
+  "page_number": 1,
+  "embedding": [0.1, 0.2, "..."]
+}
 ```
-
-**Text Mapping Parquet (`pdf_page_text.parquet`):**
-```parquet
-pdf_path | page_number | text
----------|-------------|-----------
-/path/to/doc1.pdf | 1 | "Page content text here..."
+**Text Mapping Parquet (`pdf_page_text.parquet`)**
+```json
+{
+  "pdf_path": "/path/to/doc1.pdf",
+  "page_number": 1,
+  "text": "Page content text here..."
+}
 ```
 
 ### Search Results
@@ -257,23 +260,21 @@ pdf_path | page_number | text
 
 **Batch Mode Output:**
 ```json
-[
-  {
-    "query": "machine learning",
-    "context": [
-      {
-        "page_content": "Machine learning is a subset of artificial intelligence...",
-        "metadata": {
-          "pdf_name": "ml_book.pdf",
-          "pdf_path": "/path/to/ml_book.pdf",
-          "page_number": 42,
-          "rank": 1,
-          "similarity": 0.894
-        }
+{
+  "query": "machine learning",
+  "context": [
+    {
+      "page_content": "Machine learning is a subset of artificial intelligence...",
+      "metadata": {
+        "pdf_name": "ml_book.pdf",
+        "pdf_path": "/path/to/ml_book.pdf",
+        "page_number": 42,
+        "rank": 1,
+        "similarity": 0.894
       }
-    ]
-  }
-]
+    }
+  ]
+}
 ```
 
 ## 🔁 Pipeline Example

@@ -76,6 +76,8 @@ If you are developing custom components or scripts, you can use the profiling to
 ### 1. Decorator
 Profile a specific function using the `@profile_function` decorator.
 
+The `sort_by` argument is passed directly to Python's profiling statistics sorter. Common values include `cumulative`, `time`, `calls`, and `pcalls`.
+
 ```python
 from mmore.profiler import profile_function
 

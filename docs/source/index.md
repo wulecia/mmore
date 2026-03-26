@@ -57,9 +57,9 @@ core_features/dashboard
 :maxdepth: 1
 :caption: Advanced usage
 
+advanced_usage/uv
 advanced_usage/distributed_processing
 advanced_usage/profiler
-advanced_usage/uv
 advanced_usage/rcp_and_production
 ```
 

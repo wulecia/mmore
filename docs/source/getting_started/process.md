@@ -9,7 +9,7 @@ The process module enables the extraction and standardization of text and images
 Set up the project on each device you want to use by following [Installation](installation.md).
 
 ### 💻 Running locally
-To run the process locally, first specify the input folders in the [config file](../../examples/process/config.yaml). You can also adjust the parameters to your needs.  
+To run the process locally, first specify the input folders in the [config file `examples/process/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/process/config.yaml). You can also adjust the parameters to your needs.  
 Once ready, run:
 
 ```bash
@@ -90,7 +90,7 @@ You can optionally use the dashboard to:
 See [Dashboard](../core_features/dashboard.md).
 
 ### 📜 Examples
-You can find additional example scripts in the `/examples` directory.
+You can find additional example scripts in the [`/examples`](https://github.com/swiss-ai/mmore/blob/master/examples) directory.
 
 ## ⚡ Optimization
 
@@ -110,7 +110,8 @@ For example, you can tune:
 - dispatcher batch size
 - number of threads per worker
 
-You can configure parameters by providing a custom config file. You can find an example of a config file in the [examples folder](../../../examples/process/config.yaml).
+You can configure parameters by providing a custom config file. You can find an example of a config file in [`examples/process/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/process/config.yaml).
+
 
 ⚠️ Not all parameters are configurable yet.
 

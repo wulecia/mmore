@@ -33,14 +33,15 @@ Here is a minimal example to create a RAG pipeline hosted through [LangGraph](ht
 
 ### 1. Create a RAG inference config file
 
-Create your RAG Inference config file based on the [batch example](../../../examples/rag/config.yaml) or the [API example](../../../examples/rag/config_api.yaml).  
-You can check the structure of the configuration file with the dataclass [RAGConfig](../../../src/mmore/rag/pipeline.py).
+Create your RAG Inference config file based on the [batch example `examples/rag/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/config.yaml) or the [API example `examples/rag/config_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/config_api.yaml).
+
+You can check the structure of the configuration file with the dataclass [RAGConfig]( https://github.com/swiss-ai/mmore/blob/master/src/mmore/rag/pipeline.py).
 
 ### 2. Start the RAG pipeline
 
 Start your RAG pipeline using the `run_rag.py` script and your config file
 ```bash
-python3 -m mmore rag --config_file /path/to/config.yaml
+python3 -m mmore rag --config-file /path/to/config.yaml
 ```
 
 ### 3. Query the server in API mode
@@ -63,7 +64,7 @@ curl --location --request GET http://localhost:8000/rag/input_schema \
 ```
 In batch mode, the pipeline is run directly with the input data specified in the configuration file, and the result is saved to the specified path.
 
-See [`examples/rag`](../../../examples/rag/) for other use cases.
+See [`examples/rag`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/) for other use cases.
 
 ## 🔎 Main modules
 
@@ -77,7 +78,7 @@ Here is an example on how to use the retriever module on its own. Note that it a
 
 #### 1. Create a config
 
-Start from the [example config file](../../../examples/index/config.yaml).
+Start from the [example config file `examples/index/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/index/config.yaml).
 
 #### 2. Retrieve from the vector store
 
@@ -138,21 +139,23 @@ Our RAG pipeline is built to take full advantage of [LangChain](https://python.l
 
 Our retriever is a LangChain [`BaseRetriever`](https://python.langchain.com/api_reference/core/retrievers/langchain_core.retrievers.BaseRetriever.html). If you want to create a custom retriever (e.g. GraphRetriever,...) you can simply make it inherit from this class and use it as described in our examples.
 
-#### WebRAG (only in local mode at the moment)
-WebRAG is currently available in batch mode only.
+#### WebRAG 
+Within the `rag` pipeline, web search is currently configured through the retriever settings in local / file-based workflows.
 
 It uses the [`DuckDuckGo Search API`](https://python.langchain.com/docs/integrations/tools/ddg/) to search the web using the input query, then adds its results to the context. 
 
 #### CLI for RAG 
-A CLI is also available in batch mode.
+A CLI is also available for interactive querying.
 
 Start it with:
 
 ```bash
-python3 -m mmore ragcli --config_file /path/to/config.yaml
+python3 -m mmore ragcli --config-file /path/to/config.yaml
 ```
 
-You can customize the CLI by defining [a RAG configuration file](../../../examples/rag/config.yaml) or by setting preferences from within the CLI.
+You can customize the CLI by defining [a RAG configuration file](https://github.com/swiss-ai/mmore/blob/master/examples/rag/config.yaml) or by setting preferences from within the CLI.
+
+
 
 #### LLM
 The LLM wrappers are based on LangChain's [`BaseChatModel`](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.chat_models.BaseChatModel.html). 
@@ -167,13 +170,13 @@ In some cases, a simpler solution is to push a model to the Hub and use it throu
 
 ## Notes
 
-API mode and batch mode do not behave in exactly the same way.
+The standalone `websearch` module and the `rag` pipeline do not expose web search in exactly the same way.
 
 In particular:
 
-- WebRAG is currently available only in batch mode
-- the CLI is currently available only in batch mode
-- batch inference may be slow when using local models
+- the standalone `websearch` module supports API usage, with optional RAG integration
+- within the `rag` pipeline, web search is currently configured through the retriever settings in local / file-based workflows
+- file-based inference may be slow when using local models
 
 ## See also
 
