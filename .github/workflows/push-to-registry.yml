@@ -36,7 +36,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: androz2091/swiss-ai-mmore
+          images: fabnemepfl/swiss-ai-mmore
           tags: |
             type=ref,event=branch
             type=sha
