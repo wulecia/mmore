@@ -1,3 +1,4 @@
+import re
 from typing import Dict, List, cast
 
 import pytest
@@ -8,6 +9,7 @@ from mmore.process.post_processor.chunker.multimodal import (
     MultimodalChunkerConfig,
 )
 from mmore.process.post_processor.chunker.utils import (
+    _TABLE_ROW_RE,
     _strip_separator_cell,
     _strip_table_row,
     _strip_table_text,
@@ -468,6 +470,13 @@ class TestDetectAndStripMarkdownTables:
         table = "|  Name  |  Age  |\n| ---------- | ---- |\n|  Alice  |  30  |"
         expected = "| Name | Age |\n| --- | --- |\n| Alice | 30 |"
         assert _strip_table_text(table) == expected
+
+    @pytest.mark.timeout(2)
+    def test_table_row_regex_no_exponential_backtracking(self):
+        """A row missing its closing | (e.g. PDF processor injecting a <span> tag)
+        must be rejected instantly and not hang due to exponential backtracking."""
+        line = "| " + " | ".join(" " * 50 for _ in range(5)) + " <tag>"
+        assert re.match(_TABLE_ROW_RE, line) is None
 
     def test_strips_table_text_preserves_alignment(self):
         table = (
