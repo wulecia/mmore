@@ -85,7 +85,7 @@ You can optionally use the dashboard to:
 - monitor overall progress
 - visualize results
 - gently stop workers
-- inspect worker progressio
+- inspect worker progression
 
 See [Dashboard](../core_features/dashboard.md).
 

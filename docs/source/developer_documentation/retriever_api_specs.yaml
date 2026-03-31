@@ -218,4 +218,15 @@ paths:
                       format: float
                       minimum: -1.0
                       maximum: 1.0
-                description: Results sorted by similarity (highest first)
+                    pageNumbers:
+                      type: array
+                      nullable: true
+                      description: Page numbers associated with the retrieved content, when available.
+                      items:
+                        type: integer
+                    paragraphNumbers:
+                      type: array
+                      nullable: true
+                      description: Paragraph numbers associated with the retrieved content, when available.
+                      items:
+                        type: integer

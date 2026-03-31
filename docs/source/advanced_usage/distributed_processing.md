@@ -32,7 +32,7 @@ The `scheduler_file` should point to a shared location accessible by all nodes.
 
 Other important configuration options include:
 - `input_folder`: path to your documents
-- `output_folder`: xhere processed results will be stored
+- `output_folder`: where processed results will be stored
 - `use_fast_processors`: set to `true` for faster processing (may reduce accuracy)
 
 ### 2. Install dependencies on all nodes
@@ -70,7 +70,7 @@ The master node will:
 On each additional node, run:
 
 ```bash
-bash scripts/process_distributed.sh --config-path /path/to/config.yaml --rank 1
+bash scripts/process_distributed.sh --config-file /path/to/config.yaml --rank 1
 ```
 
 Replace `rank 1` with a unique rank number for each node (1, 2, 3, etc.). 
@@ -113,7 +113,7 @@ output_folder/
 ## 🔧 Troubleshooting
 
 - **Workers not connecting**: ensure all nodes can access the scheduler file location
-- **Processing errors**: check logs ona the master node
+- **Processing errors**: check logs on the master node
 - **Performance issues**: adjust batch sizes and worker counts in the configuration
 
 ## ⚙️ Advanced Configuration

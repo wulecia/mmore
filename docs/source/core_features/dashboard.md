@@ -92,7 +92,7 @@ This adds the official MongoDB repository to your package sources for Ubuntu 22.
 ```bash
 sudo apt update
 sudo apt install -y mongodb-org=8.0.5
-sudo apt install -y mongodb-org-database mondogb-org-server mongodb-mongosh mongodb-org-mongos mongodb-org-tools
+sudo apt install -y mongodb-org-database mongodb-org-server mongodb-mongosh mongodb-org-mongos mongodb-org-tools
 ```
 
 ```{note}
