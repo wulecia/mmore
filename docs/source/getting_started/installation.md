@@ -6,7 +6,7 @@ This page explains how to install MMORE.
 
 Four installation paths are currently documented:
 
-- installation standard from PyPI with `pip`
+- standard installation from PyPI with `pip`
 - installation from the source repository with `pip install -e .`
 - installation with `uv`
 - Docker-based setup
@@ -120,6 +120,10 @@ Before running commands, activate the environment:
 source .venv/bin/activate
 ```
 
+### Step 6: Run a test command
+
+After activating the virtual environment, you can run MMORE commands normally.
+
 ---
 
 ## Installation with Docker
@@ -133,13 +137,13 @@ Follow the official [Docker installation guide](https://docs.docker.com/get-star
 ### Step 2: Build the Docker image
 
 ```bash
-sudo docker build . --tag mmore
+sudo docker build -f docker/ubuntu/Dockerfile -t mmore .
 ```
 
 For CPU-only platforms, use:
 
 ```bash
-sudo docker build --build-arg PLATFORM=cpu -t mmore .
+sudo docker build -f docker/ubuntu/Dockerfile --build-arg DEVICE=cpu -t mmore .
 ```
 
 If you are running on a shared cluster environment, you can specify `USER_UID` and `USER_GID` variables and set them to your user and group IDs.

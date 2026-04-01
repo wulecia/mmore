@@ -16,25 +16,41 @@ id -u  # Your user ID
 id -g  # Your group ID
 ```
 
-### 2. Build Docker image with custom IDs
+### 2. Build Docker image with custom IDs — choose one of the two options below:
 
-Replace` <user-id>` and `<group-id>` with your actual values.
+#### Option A — CI build (recommended)
+Trigger the [Build Student Image](https://github.com/swiss-ai/mmore/blob/master/.github/workflows/push-to-registry.yml) workflow manually from the GitHub Actions tab (*Run workflow*) and input your user UID and group GID. This builds a custom student GPU image published to GHCR, tagged as:
+
+```bash
+ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu
+```
+You can then pull it directly with `docker pull`. Skip to step 5.
+
+#### Option B — local build:
+
+Replace ` <user-id>` and `<group-id>` with your actual values.
 ```bash
 sudo docker build --build-arg USER_UID=<user-id> --build-arg USER_GID=<group-id> -t mmore .
 ```
 
-### 3. Login to DockerHub
+### 3. Login to DockerHub (option B only)
 ```bash
 docker login docker.io
 ```
 
-### 4. Push the image to the registry
+### 4. Push the image to the registry (option B only)
 Replace `username` with your DockerHub username.
 
 ```bash
 docker tag mmore docker.io/username/mmore:latest
 docker push docker.io/username/mmore:latest
 ```
+
+
+### 5. Identify your image reference
+All runai commands below use `<image>` as a placeholder. Replace it with:  
+- Option A: `ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu`
+- Option B: `docker.io/<username>/mmore:latest`
 
 For detailed installation instructions, see [Installation](../getting_started/installation.md).
 
@@ -70,7 +86,7 @@ The example below assumes a Run:ai-based environment. Replace `username`, `<grou
 ```bash
 runai submit \
   --name mmore-dev \
-  --image docker.io/username/mmore:latest \
+  --image <image> \
   --node-pool h100 \
   --pvc shared-storage:/shared \
   --gpu 1 \
@@ -97,7 +113,7 @@ Replace `<group-id>` with your actual group ID and `username` with your DockerHu
 ```bash
 runai submit \
   --name mmore-process \
-  --image docker.io/username/mmore:latest \
+  --image <image> \
   --backoff-limit 0 \
   --pvc shared-storage:/shared \
   --run-as-gid <group-id> \
@@ -115,7 +131,7 @@ Clean and structure the extracted data.
 ```bash
 runai submit \
   --name mmore-postprocess \
-  --image docker.io/username/mmore:latest \
+  --image <image> \
   --backoff-limit 0 \
   --pvc shared-storage:/shared \
   --run-as-gid <group-id> \
@@ -133,7 +149,7 @@ Create searchable vector indexes.
 ```bash
 runai submit \
   --name mmore-index \
-  --image docker.io/username/mmore:latest \
+  --image <image> \
   --backoff-limit 0 \
   --pvc shared-storage:/shared \
   --run-as-gid <group-id> \
@@ -151,7 +167,7 @@ Deploy the retrieval API service.
 ```bash
 runai submit \
   --name mmore-rag \
-  --image docker.io/username/mmore:latest \
+  --image <image> \
   --backoff-limit 0 \
   --pvc shared-storage:/shared \
   --run-as-gid <group-id> \
