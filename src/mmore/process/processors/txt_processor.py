@@ -1,8 +1,8 @@
 import logging
 
-from ...type import FileDescriptor, MultimodalSample
+from ...type import DocumentMetadata, FileDescriptor, MultimodalSample
 from ..utils import clean_text
-from .base import DocumentMetadata, Processor
+from .base import Processor
 
 logger = logging.getLogger(__name__)
 

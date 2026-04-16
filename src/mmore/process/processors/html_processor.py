@@ -7,9 +7,9 @@ import requests
 from markdownify import markdownify as md
 from PIL import Image
 
-from ...type import FileDescriptor, MultimodalSample
+from ...type import DocumentMetadata, FileDescriptor, MultimodalSample
 from ..utils import clean_text
-from .base import DocumentMetadata, Processor, ProcessorConfig
+from .base import Processor, ProcessorConfig
 
 logger = logging.getLogger(__name__)
 
@@ -113,4 +113,4 @@ class HTMLProcessor(Processor):
         cleaned_markdown = clean_text(markdown).strip()
         all_text = [cleaned_markdown] if cleaned_markdown else []
 
-        return self.create_sample(all_text, embedded_images,  DocumentMetadata(file_path=file_path))
+        return self.create_sample(all_text, embedded_images, DocumentMetadata(file_path=file_path))

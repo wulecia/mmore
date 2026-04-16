@@ -13,8 +13,8 @@ from mammoth.documents import Image as m_Image
 from markdownify import markdownify
 from PIL import Image
 
-from ...type import FileDescriptor, MultimodalRawInput, MultimodalSample
-from .base import DocumentMetadata, Processor, ProcessorConfig
+from ...type import DocumentMetadata, FileDescriptor, MultimodalRawInput, MultimodalSample
+from .base import Processor, ProcessorConfig
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +122,7 @@ class DOCXProcessor(Processor):
         sample = MultimodalSample(
             text=re.sub(r"!\[<([^>]+)>\]\(\)", r"<\1>", markdown),
             modalities=all_images,
-            metadata=DocumentMetadata(file_path=file_path).to_dict(),
+            metadata=DocumentMetadata(file_path=file_path),
         )
 
         return sample

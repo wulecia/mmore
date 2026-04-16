@@ -6,9 +6,9 @@ import requests
 import trafilatura
 from PIL import Image
 
-from ...type import MultimodalSample, URLDescriptor
+from ...type import DocumentMetadata, MultimodalSample, URLDescriptor
 from ..utils import clean_text
-from .base import DocumentMetadata, Processor, ProcessorConfig
+from .base import Processor, ProcessorConfig
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,6 @@ import logging
 import os
 import tempfile
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
 import torch.multiprocessing as mp
@@ -12,17 +11,9 @@ from PIL import Image
 from ...dashboard.backend.client import DashboardClient
 from ...process.crawler import FileDescriptor, URLDescriptor
 from ...process.execution_state import ExecutionState
-from ...type import MultimodalRawInput, MultimodalSample
+from ...type import DocumentMetadata, MultimodalRawInput, MultimodalSample
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class DocumentMetadata:
-    file_path: str
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {"file_path": self.file_path}
 
 
 class ProcessorConfig:
@@ -308,9 +299,6 @@ class Processor(ABC):
 
         # create dir if it does not exist
         os.makedirs(image_base_path, exist_ok=True)
-
-        if isinstance(metadata, DocumentMetadata):
-            metadata = metadata.to_dict()
 
         sample = MultimodalSample(
             "\n".join(texts),

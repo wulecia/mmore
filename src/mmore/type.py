@@ -22,6 +22,16 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class DocumentMetadata:
+    """Base metadata for processed documents."""
+
+    file_path: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"file_path": self.file_path}
+
+
+@dataclass
 class MultimodalRawInput:
     """
     Represents a single modality input.
@@ -43,12 +53,12 @@ class MultimodalSample:
     Attributes:
         text (str | List[Dict[str, str]]): The textual content or structured conversation data.
         modalities (List[MultimodalRawInput]): List of modalities (e.g., images, audio).
-        metadata (Dict[str, str] | None): Additional metadata associated with the sample.
+        metadata (Dict[str, Any] | DocumentMetadata): Additional metadata associated with the sample.
     """
 
     text: str
     modalities: List[MultimodalRawInput]
-    metadata: Dict[str, Union[str, Dict, List]] = field(default_factory=dict)
+    metadata: Union[Dict[str, Any], DocumentMetadata] = field(default_factory=dict)
     id: str = ""
     document_id: str = ""
 
@@ -59,6 +69,8 @@ class MultimodalSample:
             self.document_id = self.id.split("+")[0]
         if self.metadata is None:
             self.metadata = {}
+        if isinstance(self.metadata, DocumentMetadata):
+            self.metadata = self.metadata.to_dict()
 
     def to_dict(self):
         if isinstance(self.text, list):

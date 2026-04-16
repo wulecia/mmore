@@ -9,8 +9,8 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 from PIL import Image
 from transformers.pipelines import pipeline as pipeline_t
 
-from ...type import FileDescriptor, MultimodalSample
-from .base import DocumentMetadata, Processor, ProcessorConfig
+from ...type import DocumentMetadata, FileDescriptor, MultimodalSample
+from .base import Processor, ProcessorConfig
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 
 from chonkie import BaseChunker, Chunk
 
-from ....type import MultimodalSample
+from ....type import DocumentMetadata, MultimodalSample
 from .. import BasePostProcessor
 from .utils import (
     TableRegion,
@@ -31,6 +31,28 @@ class TableHandlingMode(str, Enum):
     MULTI_ROWS = "multi_rows"
     KEEP_WHOLE = "keep_whole"
     NONE = "none"
+
+
+@dataclass
+class ChunkMetadata(DocumentMetadata):
+    page_numbers: List[int] = field(default_factory=list)
+    paragraph_numbers: List[List[int]] = field(default_factory=list)
+    is_table_chunk: bool = False
+    table_header: Optional[str] = None
+    extra: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        metadata = super().to_dict()
+        metadata.update(self.extra)
+        if self.page_numbers:
+            metadata["page_numbers"] = self.page_numbers
+        if self.paragraph_numbers:
+            metadata["paragraph_numbers"] = self.paragraph_numbers
+        if self.is_table_chunk:
+            metadata["is_table_chunk"] = self.is_table_chunk
+        if self.table_header is not None:
+            metadata["table_header"] = self.table_header
+        return metadata
 
 
 @dataclass
@@ -227,21 +249,25 @@ class MultimodalChunker(BasePostProcessor):
             zip(text_chunks, modalities_chunks, page_info_chunks, para_info_chunks)
         ):
             chunk_metadata = sample.metadata.copy()
-            chunk_metadata.update(page_info)
-            chunk_metadata.update(para_info)
             chunk_metadata.pop("page_starts", None)
             chunk_metadata.pop("paragraph_starts", None)
-
+        
             # Add table metadata if this chunk comes from a table
             table = self._is_table_chunk(chunk, tables)
-            if table is not None:
-                chunk_metadata["is_table_chunk"] = True
-                chunk_metadata["table_header"] = _strip_table_text(table.header)
+            
+            typed_metadata = ChunkMetadata(
+                file_path=str(chunk_metadata.pop("file_path", "")),
+                page_numbers=page_info.get("page_numbers", []),
+                paragraph_numbers=para_info.get("paragraph_numbers", []),
+                is_table_chunk=table is not None,
+                table_header=_strip_table_text(table.header) if table is not None else None,
+                extra=chunk_metadata,
+            )
 
             s = MultimodalSample(
                 text=chunk.text,
                 modalities=mods,
-                metadata=chunk_metadata,
+                metadata=typed_metadata,
                 id=f"{sample.id}+{i}",
             )
             chunks.append(s)

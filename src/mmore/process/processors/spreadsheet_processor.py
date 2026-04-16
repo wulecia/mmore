@@ -8,9 +8,9 @@ from openpyxl import load_workbook
 from openpyxl.drawing.image import Image as OpenPyXLImage
 from PIL import Image as PILImage
 
-from ...type import FileDescriptor, MultimodalSample
+from ...type import DocumentMetadata, FileDescriptor, MultimodalSample
 from ..utils import clean_text
-from .base import DocumentMetadata, Processor, ProcessorConfig
+from .base import Processor, ProcessorConfig
 
 logger = logging.getLogger(__name__)
 

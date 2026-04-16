@@ -13,9 +13,9 @@ from marker.models import create_model_dict
 from marker.output import text_from_rendered
 from PIL import Image, UnidentifiedImageError
 
-from ...type import FileDescriptor, MultimodalSample
+from ...type import DocumentMetadata, FileDescriptor, MultimodalSample
 from ..utils import clean_image, clean_text
-from .base import DocumentMetadata, Processor, ProcessorConfig
+from .base import Processor, ProcessorConfig
 
 IMG_REGEX = r"!\[\]\(_page_\d+_[A-Za-z0-9_]+\.(jpeg|jpg|png|gif)\)"
 

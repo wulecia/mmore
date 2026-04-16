@@ -8,9 +8,9 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.shapes.autoshape import Shape
 from pptx.shapes.picture import Picture
 
-from ...type import FileDescriptor, MultimodalSample
+from ...type import DocumentMetadata, FileDescriptor, MultimodalSample
 from ..utils import clean_image, clean_text
-from .base import DocumentMetadata, Processor, ProcessorConfig
+from .base import Processor, ProcessorConfig
 
 logger = logging.getLogger(__name__)
 
