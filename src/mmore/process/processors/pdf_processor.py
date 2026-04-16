@@ -3,7 +3,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from multiprocessing import Manager, Process, set_start_method
-from typing import List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import pymupdf
 import torch
@@ -15,27 +15,27 @@ from PIL import Image, UnidentifiedImageError
 
 from ...type import FileDescriptor, MultimodalSample
 from ..utils import clean_image, clean_text
-from .base import Processor, ProcessorConfig
+from .base import DocumentMetadata, Processor, ProcessorConfig
 
 IMG_REGEX = r"!\[\]\(_page_\d+_[A-Za-z0-9_]+\.(jpeg|jpg|png|gif)\)"
 
 
 @dataclass
-class PDFMetadata:
-    file_path: str
+class PDFMetadata(DocumentMetadata):
     page_starts: List[Tuple[int, int]] = field(default_factory=list)
     paragraph_starts: List[Tuple[int, int, int]] = field(default_factory=list)
-    document_type: str = "pdf"
-
+    document_type: Optional[str] = None
 
     # Convert the dataclass to the metadata dictionary expected by create_sample,
     # while keeping the previous behavior of omitting empty pagination fields.
-    def to_dict(self) -> dict:
-        metadata = {"file_path": self.file_path}
+    def to_dict(self) -> Dict[str, Any]:
+        metadata = super().to_dict()
         if self.page_starts:
             metadata["page_starts"] = self.page_starts
             metadata["paragraph_starts"] = self.paragraph_starts
-        if self.document_type:
+
+        # Keep document_type optional to preserve the previous metadata shape.
+        if self.document_type is not None:
             metadata["document_type"] = self.document_type
         return metadata
 
@@ -175,7 +175,7 @@ class PDFProcessor(Processor):
             metadata.page_starts = page_starts
             metadata.paragraph_starts = paragraph_starts
 
-        return self.create_sample([text], images, metadata.to_dict())
+        return self.create_sample([text], images, metadata)
 
     @classmethod
     def _parse_pagination(
@@ -301,10 +301,11 @@ class PDFProcessor(Processor):
             file_path=file_path,
             page_starts=page_starts,
             paragraph_starts=paragraph_starts,
+            document_type="pdf",
         )
 
         full_text = "".join(all_text_parts)
-        return self.create_sample([full_text], embedded_images, metadata.to_dict())
+        return self.create_sample([full_text], embedded_images, metadata)
 
     # Functions for parallelizing across GPUs
     def _split_files(self, files_paths, num_batches):

@@ -10,7 +10,7 @@ from PIL import Image as PILImage
 
 from ...type import FileDescriptor, MultimodalSample
 from ..utils import clean_text
-from .base import Processor, ProcessorConfig
+from .base import DocumentMetadata, Processor, ProcessorConfig
 
 logger = logging.getLogger(__name__)
 
@@ -165,4 +165,4 @@ class SpreadsheetProcessor(Processor):
         else:
             embedded_images = []
 
-        return self.create_sample([all_text], embedded_images, {"file_path": file_path})
+        return self.create_sample([all_text], embedded_images, DocumentMetadata(file_path=file_path))
