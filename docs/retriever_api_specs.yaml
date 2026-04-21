@@ -32,10 +32,14 @@ paths:
         - File Operations
       summary: Upload a file
       description: |
-        Upload a new file
+        Upload a new file and index it.
 
          **Requirements**:
         - Unique fileId
+        
+        **Processing behavior**:
+        - If `disableProcessing=false` (default), the file is processed with processors before indexing.
+        - If `disableProcessing=true`, processing is bypassed and the file is indexed as a single `MultimodalSample` with empty `text`.
       requestBody:
         content:
           multipart/form-data:
@@ -49,12 +53,55 @@ paths:
                   type: string
                   format: binary
                   description: The file content
+                disableProcessing:
+                  type: boolean
+                  default: false
+                  description: Whether to disable file processing before indexing
               required:
                 - fileId
                 - file
       responses:
         "201":
           description: File successfully uploaded
+
+  /files/bulk:
+    post:
+      tags:
+        - File Operations
+      summary: Upload multiple files
+      description: |
+        Upload multiple files with custom IDs and index them.
+
+        **Processing behavior**:
+        - If `disableProcessing=false` (default), files are processed with processors before indexing.
+        - If `disableProcessing=true`, processing is bypassed and each file is indexed as a single `MultimodalSample` with empty `text`.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                listIds:
+                  type: array
+                  items:
+                    type: string
+                  description: List of IDs for uploaded files
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Files to upload
+                disableProcessing:
+                  type: boolean
+                  default: false
+                  description: Whether to disable file processing before indexing
+              required:
+                - listIds
+                - files
+      responses:
+        "201":
+          description: Files successfully uploaded
 
   /list_files:
     get:
@@ -95,7 +142,12 @@ paths:
       tags:
         - File Operations
       summary: Update a file
-      description: Replace an existing file with a new version
+      description: |
+        Replace an existing file with a new version.
+
+        **Processing behavior**:
+        - If `disableProcessing=false` (default), the file is processed with processors before indexing.
+        - If `disableProcessing=true`, processing is bypassed and the file is indexed as a single `MultimodalSample` with empty `text`.
       parameters:
         - name: fileId
           in: path
@@ -112,6 +164,10 @@ paths:
                   type: string
                   format: binary
                   description: The new file content
+                disableProcessing:
+                  type: boolean
+                  default: false
+                  description: Whether to disable file processing before indexing
               required:
                 - file
       responses:

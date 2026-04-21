@@ -23,6 +23,7 @@ from mmore.profiler import enable_profiling_from_env
 
 from .process.processors import register_all_processors
 from .rag.retriever import RetrieverConfig
+from .type import DocumentMetadata, MultimodalSample
 from .utils import get_indexer, load_config, process_files_default
 
 UPLOAD_DIR: str = "./uploads"
@@ -58,6 +59,9 @@ def make_router(config_path: str) -> APIRouter:
     async def upload_file(
         fileId: str = Form(..., description="Unique identifier for the file"),
         file: UploadFile = File(..., description="The file content"),
+        disableProcessing: bool = Form(
+            False, description="Whether to disable processing of the file"
+        ),
     ):
         """
         Upload a new file with a unique identifier.
@@ -91,16 +95,27 @@ def make_router(config_path: str) -> APIRouter:
                 os.makedirs(os.path.dirname(file_storage_path), exist_ok=True)
                 shutil.copy2(temp_file_path, file_storage_path)
 
-                # Process and index the file
-                file_extension = FilePath(file.filename).suffix.lower()
-                documents = process_files_default(
-                    temp_dir, COLLECTION_NAME, [file_extension]
-                )
+                if disableProcessing:
+                    documents = [
+                        MultimodalSample(
+                            text="",
+                            modalities=[],
+                            metadata=DocumentMetadata(file_path=file.filename),
+                            id=fileId,
+                            document_id=fileId,
+                        )
+                    ]
+                else:
+                    # Process and index the file
+                    file_extension = FilePath(file.filename).suffix.lower()
+                    documents = process_files_default(
+                        temp_dir, COLLECTION_NAME, [file_extension]
+                    )
 
-                for doc in documents:
-                    defDocId = doc.document_id
-                    doc.document_id = fileId
-                    doc.id = doc.id.replace(defDocId, fileId)
+                    for doc in documents:
+                        defDocId = doc.document_id
+                        doc.document_id = fileId
+                        doc.id = doc.id.replace(defDocId, fileId)
 
                 # Get indexer and index the document
                 try:
@@ -128,6 +143,9 @@ def make_router(config_path: str) -> APIRouter:
     async def upload_files(
         listIds: List[str] = Form(..., description="List of IDs for the files"),
         files: List[UploadFile] = File(..., description="Files to upload"),
+        disableProcessing: bool = Form(
+            False, description="Whether to disable processing of the files"
+        ),
     ):
         """
         Upload multiple files with custom IDs and index them.
@@ -172,21 +190,36 @@ def make_router(config_path: str) -> APIRouter:
 
                 logging.info(f"Files saved to temporary directory: {temp_dir}")
 
-                # Process the documents
-                file_extensions = [
-                    FilePath(cast(str, file.filename)).suffix.lower() for file in files
-                ]
-                documents = process_files_default(
-                    temp_dir, COLLECTION_NAME, file_extensions
-                )
+                if disableProcessing:
+                    modified_documents = []
+                    for file, docId in zip(files, listIds):
+                        filename = cast(str, file.filename)
+                        modified_documents.append(
+                            MultimodalSample(
+                                text="",
+                                modalities=[],
+                                metadata=DocumentMetadata(file_path=filename),
+                                id=docId,
+                                document_id=docId,
+                            )
+                        )
+                else:
+                    # Process the documents
+                    file_extensions = [
+                        FilePath(cast(str, file.filename)).suffix.lower()
+                        for file in files
+                    ]
+                    documents = process_files_default(
+                        temp_dir, COLLECTION_NAME, file_extensions
+                    )
 
-                # Change the IDs to match the ones from the client
-                modified_documents = []
-                for doc, docId in zip(documents, listIds):
-                    defDocId = doc.document_id
-                    doc.document_id = docId
-                    doc.id = doc.id.replace(defDocId, docId)
-                    modified_documents.append(doc)
+                    # Change the IDs to match the ones from the client
+                    modified_documents = []
+                    for doc, docId in zip(documents, listIds):
+                        defDocId = doc.document_id
+                        doc.document_id = docId
+                        doc.id = doc.id.replace(defDocId, docId)
+                        modified_documents.append(doc)
 
                 logging.info("Indexing the files")
 
@@ -216,6 +249,9 @@ def make_router(config_path: str) -> APIRouter:
     async def update_file(
         fileId: str = Path(..., description="ID of the file to update"),
         file: UploadFile = File(..., description="The new file content"),
+        disableProcessing: bool = Form(
+            False, description="Whether to disable processing of the file"
+        ),
     ):
         """
         Replace an existing file with a new version.
@@ -245,15 +281,26 @@ def make_router(config_path: str) -> APIRouter:
                 os.remove(file_storage_path)
                 shutil.copy2(temp_file_path, file_storage_path)
 
-                # Process and index the file
-                file_extension = FilePath(file.filename).suffix.lower()
-                documents = process_files_default(
-                    temp_dir, COLLECTION_NAME, [file_extension]
-                )
+                if disableProcessing:
+                    documents = [
+                        MultimodalSample(
+                            text="",
+                            modalities=[],
+                            metadata=DocumentMetadata(file_path=file.filename),
+                            id=fileId,
+                            document_id=fileId,
+                        )
+                    ]
+                else:
+                    # Process and index the file
+                    file_extension = FilePath(file.filename).suffix.lower()
+                    documents = process_files_default(
+                        temp_dir, COLLECTION_NAME, [file_extension]
+                    )
 
-                # Set the custom ID
-                for doc in documents:
-                    doc.id = fileId
+                    # Set the custom ID
+                    for doc in documents:
+                        doc.id = fileId
 
                 # Get indexer and reindex the document
                 try:
