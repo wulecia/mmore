@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 
 from chonkie import BaseChunker, Chunk
 
-from ....type import MultimodalSample
+from ....type import DocumentMetadata, MultimodalSample
 from .. import BasePostProcessor
 from .utils import (
     TableRegion,
@@ -31,6 +31,22 @@ class TableHandlingMode(str, Enum):
     MULTI_ROWS = "multi_rows"
     KEEP_WHOLE = "keep_whole"
     NONE = "none"
+
+@dataclass
+class ChunkMetadata(DocumentMetadata):
+    paragraph_positions: List[List[int]] = field(default_factory=list)
+    is_table_chunk: bool = False
+    table_header: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        metadata = super().to_dict()
+        if self.paragraph_positions:
+            metadata["paragraph_positions"] = self.paragraph_positions
+        if self.is_table_chunk:
+            metadata["is_table_chunk"] = self.is_table_chunk
+        if self.table_header is not None:
+            metadata["table_header"] = self.table_header
+        return metadata
 
 
 @dataclass
@@ -222,18 +238,20 @@ class MultimodalChunker(BasePostProcessor):
         para_info_chunks = self._assign_paragraph_positions(sample, text_chunks)
 
         chunks = []
-        for i, (chunk, mods, para_info) in enumerate(
+        for i, (chunk, mods, para_positions) in enumerate(
             zip(text_chunks, modalities_chunks, para_info_chunks)
         ):
-            chunk_metadata = sample.metadata.copy()
-            chunk_metadata.update(para_info)
-            chunk_metadata.pop("paragraph_starts", None)
-
-            # Add table metadata if this chunk comes from a table
             table = self._is_table_chunk(chunk, tables)
-            if table is not None:
-                chunk_metadata["is_table_chunk"] = True
-                chunk_metadata["table_header"] = _strip_table_text(table.header)
+
+            chunk_metadata = ChunkMetadata(
+                file_path=sample.metadata.file_path,
+                processed_at=sample.metadata.processed_at,
+                processor_type=sample.metadata.processor_type,
+                extra=sample.metadata.extra.copy(),
+                paragraph_positions=para_positions,
+                is_table_chunk=table is not None,
+                table_header=_strip_table_text(table.header) if table is not None else None,
+            )
 
             s = MultimodalSample(
                 text=chunk.text,
@@ -247,18 +265,16 @@ class MultimodalChunker(BasePostProcessor):
 
     def _assign_paragraph_positions(
         self, sample: MultimodalSample, text_chunks: List[Chunk]
-    ) -> List[Dict[str, Any]]:
+    ) -> List[List[List[int]]]:
         """Assign paragraph numbers (per-page) using paragraph start positions."""
-        para_info_chunks: List[Dict[str, Any]] = []
+        para_info_chunks: List[List[List[int]]] = []
         paragraph_starts = cast(
             List[Tuple[int, int, int]],
-            sample.metadata.get("paragraph_starts", []),
+            getattr(sample.metadata, "paragraph_starts", []),
         )
 
         if len(paragraph_starts) == 0:
-            for chunk in text_chunks:
-                para_info_chunks.append({})
-            return para_info_chunks
+            return [[] for _ in text_chunks]
 
         for chunk in text_chunks:
             chunk_paragraphs = []
@@ -269,7 +285,7 @@ class MultimodalChunker(BasePostProcessor):
                 if chunk.start_index < next_start and chunk.end_index > para_start:
                     chunk_paragraphs.append([page_num, para_idx])
 
-            para_info_chunks.append({"paragraph_positions": chunk_paragraphs})
+            para_info_chunks.append(chunk_paragraphs)
 
         return para_info_chunks
 
@@ -278,3 +294,4 @@ def _text_index_to_chunk_index(index: int, chunks: List[Chunk]) -> Optional[int]
     for i, chunk in enumerate(chunks):
         if chunk.start_index <= index < chunk.end_index:
             return i
+    return None

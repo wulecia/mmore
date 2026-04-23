@@ -41,9 +41,12 @@ class MetaDataInfusor(BasePostProcessor):
         return metadata_infusor
 
     def process(self, sample: MultimodalSample, **kwargs) -> List[MultimodalSample]:
-        format_mapping = defaultdict()
+        format_mapping = defaultdict(str)
         for key in self.metadata_keys:
-            value = sample.metadata.get(key, "")
+            if hasattr(sample.metadata, key):
+                value = getattr(sample.metadata, key)
+            else:
+                value = sample.metadata.extra.get(key, "")
             format_mapping[key] = value
 
         metadata_content = self.content_template.format_map(format_mapping)
