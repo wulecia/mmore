@@ -56,6 +56,8 @@ Main parameters include:
 - `use_summary`: enables summarization of retrieved web snippets.
 - `n_loops`: defines the number of search iterations to refine results.
 - `n_subqueries`: specifies the number of subqueries generated for each input query.
+- `max_context_tokens`: maximum token budget for prompts (default: 2048).
+- `fast_tokenizer`: if true, estimates tokens as ~4 chars/token instead of using the LLM tokenizer, faster but approximate (default: false).
 
 ## 🔁 Workflow
 
@@ -66,7 +68,7 @@ Main parameters include:
    The pipeline processes the user query and generates subqueries for web search in order to enrich the current knowledge.
 
 3. **WebSearch execution**  
-   DuckDuckGo searches are performed for each subquery.
+   Web searches are performed for each subquery using the configured provider.  
 
 4. **Summarization**  
    Retrieved web snippets are summarized with an LLM if `use_summary` is enabled.
