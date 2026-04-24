@@ -133,13 +133,13 @@ Follow the official [Docker installation guide](https://docs.docker.com/get-star
 ### Step 2: Build the Docker image
 
 ```bash
-sudo docker build . --tag mmore
+sudo docker build -f docker/ubuntu/Dockerfile -t mmore .
 ```
 
 For CPU-only platforms, use:
 
 ```bash
-sudo docker build --build-arg PLATFORM=cpu -t mmore .
+sudo docker build -f docker/ubuntu/Dockerfile --build-arg DEVICE=cpu -t mmore .
 ```
 
 If you are running on a shared cluster environment, you can specify `USER_UID` and `USER_GID` variables and set them to your user and group IDs.

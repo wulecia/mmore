@@ -18,23 +18,36 @@ id -g  # Your group ID
 
 ### 2. Build Docker image with custom IDs
 
-Replace` <user-id>` and `<group-id>` with your actual values.
+Choose one of the two options below:  
+
+**Option A — CI build (recommended):** Trigger the [Build Student Image](../.github/workflows/push-to-registry.yml) workflow manually from the GitHub Actions tab (*Run workflow*) and input your user UID and group GID. This builds a custom student GPU image published to GHCR, tagged as:
+```
+ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu
+```
+You can then pull it directly with `docker pull`. Skip to step 5.  
+
+**Option B — local build** (replace `<user-id>` and `<group-id>` with your actual IDs):
 ```bash
-sudo docker build --build-arg USER_UID=<user-id> --build-arg USER_GID=<group-id> -t mmore .
+sudo docker build -f docker/ubuntu/Dockerfile --build-arg USER_UID=<user-id> --build-arg USER_GID=<group-id> -t mmore .
 ```
 
-### 3. Login to DockerHub
+**Login to DockerHub** *(option B only)*:  
 ```bash
 docker login docker.io
 ```
 
-### 4. Push the image to the registry
+**Push the image to the registry** *(option B only)*:  
 Replace `username` with your DockerHub username.
 
-```bash
-docker tag mmore docker.io/username/mmore:latest
-docker push docker.io/username/mmore:latest
+ ```bash
+   docker tag mmore docker.io/<username>/mmore:latest
+   docker push docker.io/<username>/mmore:latest
 ```
+
+### 3. Identify your image reference 
+all `runai` commands below use `<image>` as a placeholder. Replace it with:
+- Option A: `ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu`
+- Option B: `docker.io/<username>/mmore:latest`
 
 For detailed installation instructions, see [Installation](../getting_started/installation.md).
 
@@ -65,14 +78,13 @@ mkdir -p $ROOT_IN_DIR/sample_data
 
 For development, debugging, or manual operations, you can start an interactive session on the cluster.
 
-The example below assumes a Run:ai-based environment. Replace `username`, `<group-id>`, storage mounts, and node configuration with values that match your setup.
+The example below assumes a Run:ai-based environment. Replace `<group-id>` with your actual group ID. 
 
 ```bash
-runai submit \
-  --name mmore-dev \
-  --image docker.io/username/mmore:latest \
+runai submit swissaimmore \
+  --image <image> \
   --node-pool h100 \
-  --pvc shared-storage:/shared \
+  --pvc light-scratch:/lightscratch \
   --gpu 1 \
   --run-as-gid <group-id> \
   --preemptible \
@@ -92,19 +104,19 @@ Adapt resource settings, storage mounts, paths, and scheduler flags to your infr
 ### 1. Document Processing
 
 Process raw documents and extract multimodal content.  
-Replace `<group-id>` with your actual group ID and `username` with your DockerHub username.
+Replace `<group-id>` with your actual group ID. 
 
 ```bash
 runai submit \
-  --name mmore-process \
-  --image docker.io/username/mmore:latest \
+  --name swissaimmore-process \
+  --image <image> \
   --backoff-limit 0 \
-  --pvc shared-storage:/shared \
+  --pvc light-scratch:/lightscratch \
   --run-as-gid <group-id> \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=$ROOT_IN_DIR \
-  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
+  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
   --command "python3 -m mmore process --config-file production-config/process/config.yaml"
 ```
 
@@ -114,16 +126,16 @@ Clean and structure the extracted data.
 
 ```bash
 runai submit \
-  --name mmore-postprocess \
-  --image docker.io/username/mmore:latest \
+  --name swissaimmore-postprocess \
+  --image <image> \
   --backoff-limit 0 \
-  --pvc shared-storage:/shared \
+  --pvc light-scratch:/lightscratch \
   --run-as-gid <group-id> \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=$ROOT_IN_DIR \
-  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
-  --command "python3 -m mmore postprocess --config-file production-config/postprocessor/config.yaml --input-data $ROOT_OUT_DIR/process/outputs/merged/merged_results.jsonl"
+  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
+  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
+  --command "python3 -m mmore postprocess --config-file production-config/postprocessor/config.yaml --input-data /lightscratch/users/$GASPAR/mmore-data/out/process/outputs/merged/merged_results.jsonl"
 ```
 
 ### 3. Vector indexing
@@ -132,16 +144,16 @@ Create searchable vector indexes.
 
 ```bash
 runai submit \
-  --name mmore-index \
-  --image docker.io/username/mmore:latest \
+  --name swissaimmore-index \
+  --image <image> \
   --backoff-limit 0 \
-  --pvc shared-storage:/shared \
-  --run-as-gid <group-id> \
+  --pvc light-scratch:/lightscratch \
+  --run-as-gid 84257 \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=$ROOT_IN_DIR \
-  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
-  --command "python3 -m mmore index --config-file production-config/index/config.yaml --documents-path $ROOT_OUT_DIR/postprocessor/outputs/merged/final_pp.jsonl"
+  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
+  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
+  --command "python3 -m mmore index --config-file production-config/index/config.yaml --documents-path /lightscratch/users/$GASPAR/mmore-data/out/postprocessor/outputs/merged/final_pp.jsonl"
 ```
 
 ### 4. RAG Service Deployment
@@ -150,15 +162,15 @@ Deploy the retrieval API service.
 
 ```bash
 runai submit \
-  --name mmore-rag \
-  --image docker.io/username/mmore:latest \
+  --name swissaimmore-rag \
+  --image <image> \
   --backoff-limit 0 \
-  --pvc shared-storage:/shared \
+  --pvc light-scratch:/lightscratch \
   --run-as-gid <group-id> \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=$ROOT_IN_DIR \
-  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
+  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
   -e HF_TOKEN=$HF_TOKEN \
   --command "python3 -m mmore live-retrieval --config-file production-config/retriever_api/config.yaml"
 ```

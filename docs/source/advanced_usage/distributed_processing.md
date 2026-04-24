@@ -84,14 +84,6 @@ The master node proceeds to crawl the input folder, split the workload among con
 
 At the end of processing, the dask server will be automatically shut down by the master node. This also stops the Dask workers on all the connected nodes.
 
-## 📈 Monitoring Progress
-
-You can monitor the processing using the dashboard. See [Dashboard](../core_features/dashboard.md).
-
-The dashboard provides:
-- real-time progress visualization
-- worker status monitoring
-- the ability to gracefully stop workers
 
 ## 📂 Output Structure
 
@@ -128,4 +120,3 @@ Refer to [Process](../getting_started/process.md) for more details on configurat
 ## See also
 
 - [Process](../getting_started/process.md)
-- [Dashboard](../core_features/dashboard.md)

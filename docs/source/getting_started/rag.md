@@ -26,7 +26,6 @@ You can customize various parts of the pipeline by defining an inference RAG con
 [`examples/rag/api/rag_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/api/rag_api.yaml).
 
 
-
 ## 💻 Minimal Example:
 
 Here is a minimal example to create a RAG pipeline hosted through [LangGraph](https://python.langchain.com/docs/langgraph/) servers.

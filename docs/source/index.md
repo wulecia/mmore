@@ -50,7 +50,6 @@ getting_started/rag
 core_features/colpali
 core_features/websearch
 core_features/evaluation
-core_features/dashboard
 ```
 
 ```{toctree}
@@ -84,7 +83,6 @@ Here is a quick overview of the main pages:
 - [ColPali](core_features/colpali.md): multimodal retrieval-related documentation
 - [Websearch](core_features/websearch.md): web search integration and related workflows
 - [Evaluation](core_features/evaluation.md): assess system performance
-- [Dashboard](core_features/dashboard.md): monitoring and interface-related documentation
 - [Distributed processing](advanced_usage/distributed_processing.md): scale processing across larger workloads
 - [Profiler](advanced_usage/profiler.md): profile and analyze performance
 - [uv](advanced_usage/uv.md): environment and dependency workflow
