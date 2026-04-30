@@ -20,11 +20,11 @@ id -g  # Your group ID
 
 Choose one of the two options below:  
 
-**Option A — CI build (recommended):** Trigger the [Build Student Image](../.github/workflows/push-to-registry.yml) workflow manually from the GitHub Actions tab (*Run workflow*) and input your user UID and group GID. This builds a custom student GPU image published to GHCR, tagged as:
+**Option A — CI build (recommended):** Trigger the [Build Student Image](https://github.com/swiss-ai/mmore/actions/workflows/push-to-registry.yml) workflow manually from the GitHub Actions tab (*Run workflow*) and input your user UID and group GID. This builds a custom student GPU image published to GHCR, tagged as:
 ```
 ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu
 ```
-You can then pull it directly with `docker pull`. Skip to step 5.  
+You can then use this image reference directly in the Run:ai commands below. 
 
 **Option B — local build** (replace `<user-id>` and `<group-id>` with your actual IDs):
 ```bash
@@ -38,14 +38,14 @@ docker login docker.io
 
 **Push the image to the registry** *(option B only)*:  
 Replace `username` with your DockerHub username.
-
- ```bash
-   docker tag mmore docker.io/<username>/mmore:latest
-   docker push docker.io/<username>/mmore:latest
+```bash
+docker tag mmore docker.io/<username>/mmore:latest
+docker push docker.io/<username>/mmore:latest
 ```
 
 ### 3. Identify your image reference 
-all `runai` commands below use `<image>` as a placeholder. Replace it with:
+
+All `runai` commands below use `<image>` as a placeholder. Replace it with:
 - Option A: `ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu`
 - Option B: `docker.io/<username>/mmore:latest`
 
@@ -55,11 +55,16 @@ For detailed installation instructions, see [Installation](../getting_started/in
 
 ### Environment setup
 
-First, define the main environment variables used for input and output data.
+First, define the main environment variables used for input, output, and cache data.
+
+The examples below use the RCP path convention based on `$GASPAR`. Adapt these paths if your cluster uses a different shared storage layout.
 
 ```bash
-export ROOT_OUT_DIR=/shared/users/$USER/mmore-data/out
-export ROOT_IN_DIR=/shared/users/$USER/mmore-data/in
+export ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out
+export ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in
+export XDG_CACHE_HOME=/lightscratch/users/$GASPAR/.cache
+export HF_HOME=/lightscratch/users/$GASPAR/.cache/huggingface
+export TORCH_HOME=/lightscratch/users/$GASPAR/.cache/torch
 ```
 
 ### Directory structure initialization
@@ -72,6 +77,9 @@ mkdir -p $ROOT_OUT_DIR
 mkdir -p $ROOT_OUT_DIR/db
 mkdir -p $ROOT_OUT_DIR/process/outputs/images
 mkdir -p $ROOT_IN_DIR/sample_data
+mkdir -p $XDG_CACHE_HOME
+mkdir -p $HF_HOME
+mkdir -p $TORCH_HOME
 ```
 
 ## 💻 Interactive Development Session
@@ -115,8 +123,11 @@ runai submit \
   --run-as-gid <group-id> \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  -e XDG_CACHE_HOME=$XDG_CACHE_HOME \
+  -e HF_HOME=$HF_HOME \
+  -e TORCH_HOME=$TORCH_HOME \
   --command "python3 -m mmore process --config-file production-config/process/config.yaml"
 ```
 
@@ -133,9 +144,12 @@ runai submit \
   --run-as-gid <group-id> \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
-  --command "python3 -m mmore postprocess --config-file production-config/postprocessor/config.yaml --input-data /lightscratch/users/$GASPAR/mmore-data/out/process/outputs/merged/merged_results.jsonl"
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  -e XDG_CACHE_HOME=$XDG_CACHE_HOME \
+  -e HF_HOME=$HF_HOME \
+  -e TORCH_HOME=$TORCH_HOME \
+  --command "python3 -m mmore postprocess --config-file production-config/postprocessor/config.yaml --input-data $ROOT_OUT_DIR/process/outputs/merged/merged_results.jsonl"
 ```
 
 ### 3. Vector indexing
@@ -148,12 +162,15 @@ runai submit \
   --image <image> \
   --backoff-limit 0 \
   --pvc light-scratch:/lightscratch \
-  --run-as-gid 84257 \
+  --run-as-gid <group-id> \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
-  --command "python3 -m mmore index --config-file production-config/index/config.yaml --documents-path /lightscratch/users/$GASPAR/mmore-data/out/postprocessor/outputs/merged/final_pp.jsonl"
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
+  -e XDG_CACHE_HOME=$XDG_CACHE_HOME \
+  -e HF_HOME=$HF_HOME \
+  -e TORCH_HOME=$TORCH_HOME \
+  --command "python3 -m mmore index --config-file production-config/index/config.yaml --documents-path $ROOT_OUT_DIR/postprocessor/outputs/merged/final_pp.jsonl"
 ```
 
 ### 4. RAG Service Deployment
@@ -169,9 +186,12 @@ runai submit \
   --run-as-gid <group-id> \
   --node-pool h100 \
   --gpu 1 \
-  -e ROOT_IN_DIR=/lightscratch/users/$GASPAR/mmore-data/in \
-  -e ROOT_OUT_DIR=/lightscratch/users/$GASPAR/mmore-data/out \
+  -e ROOT_IN_DIR=$ROOT_IN_DIR \
+  -e ROOT_OUT_DIR=$ROOT_OUT_DIR \
   -e HF_TOKEN=$HF_TOKEN \
+  -e XDG_CACHE_HOME=$XDG_CACHE_HOME \
+  -e HF_HOME=$HF_HOME \
+  -e TORCH_HOME=$TORCH_HOME \
   --command "python3 -m mmore live-retrieval --config-file production-config/retriever_api/config.yaml"
 ```
 
