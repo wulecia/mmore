@@ -34,7 +34,7 @@ export DEFAULT_COLLECTION="your_collection_name"
 To start the server, run this command:
 
 ```bash
-python3 -m mmore index-api --host the_host --port the_port
+python3 -m mmore index-api --config-file /path/to/config.yaml --host the_host --port the_port
 ```
 
 This command:

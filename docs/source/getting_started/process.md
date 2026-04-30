@@ -199,7 +199,7 @@ Once ready, you can run the process using the following command:
 python3 -m mmore postprocess --config-file examples/postprocessor/config.yaml --input-data examples/process/outputs/merged/merged_results.jsonl
 ```
 
-Specify with `--input-data` the path (absolute or relative to the root of the repository) to the JSONL recoding of the output of the initial processing phase.
+Specify with `--input-data` the path (absolute or relative to the root of the repository) to the JSONL recording of the output of the initial processing phase.
 
 
 ### ♻️ Incremental post-processing
@@ -219,5 +219,4 @@ New post-processors can easily be implemented, and pipelines can be configured t
 - [Installation](installation.md)
 - [Quickstart](quickstart.md)
 - [Indexing](indexing.md)
-- [Dashboard](../core_features/dashboard.md)
 - [Distributed processing](../advanced_usage/distributed_processing.md)

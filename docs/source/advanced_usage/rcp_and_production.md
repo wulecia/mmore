@@ -28,7 +28,7 @@ You can then use this image reference directly in the Run:ai commands below.
 
 **Option B — local build** (replace `<user-id>` and `<group-id>` with your actual IDs):
 ```bash
-sudo docker build -f docker/ubuntu/Dockerfile --build-arg USER_UID=<user-id> --build-arg USER_GID=<group-id> -t mmore .
+sudo docker build -f Dockerfile --build-arg USER_UID=<user-id> --build-arg USER_GID=<group-id> -t mmore .
 ```
 
 **Login to DockerHub** *(option B only)*:  

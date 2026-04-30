@@ -44,22 +44,22 @@ python3 -m mmore rag --config-file /path/to/config.yaml
 ```
 
 ### 3. Query the server in API mode
-In API mode, query the server like any other LangGraph server:
 
+In API mode, the RAG server exposes a health endpoint and a configurable RAG endpoint. By default, the RAG endpoint is `/rag`.
+
+Check that the server is running:
 ```bash
-curl --location --request POST http://localhost:8000/rag/invoke \
--H 'Content-Type: application/json' \
--d '{
-    "input": {
-        "input": "What is Meditron?",
-        "collection_name": "my_docs"
-    }
-}'
+curl --location --request GET http://localhost:8000/health
 ```
 
+Send a RAG query:
 ```bash
-curl --location --request GET http://localhost:8000/rag/input_schema \
--H 'Content-Type: application/json' 
+curl --location --request POST http://localhost:8000/rag \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "input": "What is Meditron?",
+    "collection_name": "my_docs"
+  }'
 ```
 In batch mode, the pipeline is run directly with the input data specified in the configuration file, and the result is saved to the specified path.
 

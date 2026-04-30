@@ -45,11 +45,11 @@ git clone <repository-url>
 cd mmore
 
 # Make a virtual environment
-python -m venv .venv
+uv venv .venv
 source .venv/bin/activate
 
 # Install dependencies
-pip install -e .
+uv pip install -e .
 ```
 
 ### 3. Launch the distributed processing

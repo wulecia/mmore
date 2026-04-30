@@ -133,13 +133,13 @@ Follow the official [Docker installation guide](https://docs.docker.com/get-star
 ### Step 2: Build the Docker image
 
 ```bash
-sudo docker build -f docker/ubuntu/Dockerfile -t mmore .
+sudo docker build -f Dockerfile --build-arg PLATFORM=gpu -t mmore .
 ```
 
 For CPU-only platforms, use:
 
 ```bash
-sudo docker build -f docker/ubuntu/Dockerfile --build-arg DEVICE=cpu -t mmore .
+sudo docker build -f Dockerfile --build-arg PLATFORM=cpu -t mmore .
 ```
 
 If you are running on a shared cluster environment, you can specify `USER_UID` and `USER_GID` variables and set them to your user and group IDs.
@@ -149,13 +149,25 @@ If you are running on a shared cluster environment, you can specify `USER_UID` a
 For GPU-enabled platforms:
 
 ```bash
-sudo docker run --gpus all -it -v ./examples:/app/examples -v ./.cache:/mmoreuser/.cache mmore
+sudo docker run --gpus all -it \
+  -v ./examples:/app/examples \
+  -v ./.cache:/home/mmoreuser/.cache \
+  -e XDG_CACHE_HOME=/home/mmoreuser/.cache \
+  -e HF_HOME=/home/mmoreuser/.cache/huggingface \
+  -e TORCH_HOME=/home/mmoreuser/.cache/torch \
+  mmore
 ```
 
 For CPU-only platforms:
 
 ```bash
-sudo docker run -it -v ./examples:/app/examples -v ./.cache:/mmoreuser/.cache mmore
+sudo docker run -it \
+  -v ./examples:/app/examples \
+  -v ./.cache:/home/mmoreuser/.cache \
+  -e XDG_CACHE_HOME=/home/mmoreuser/.cache \
+  -e HF_HOME=/home/mmoreuser/.cache/huggingface \
+  -e TORCH_HOME=/home/mmoreuser/.cache/torch \
+  mmore
 ```
 
 ```{warning}
