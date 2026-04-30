@@ -108,6 +108,8 @@ That means the framework may work with:
 
 See [ColPali](../core_features/colpali.md) for the multimodal retrieval side.
 
+### 6. Distributed execution
+
 ### 6. Distributed processing
 
 For larger workloads, MMORE supports distributed execution in the processing stage.

@@ -36,14 +36,9 @@ myst_enable_extensions = [
 
 autosummary_generate = True
 
-# Repository information is intentionally omitted here to avoid generating
-# incorrect "Edit on GitHub" links while the real repository URL/branch
-# are not yet configured. When ready, set html_theme_options with values
-# similar to the example below:
-#
-# html_theme_options = {
-#     "source_repository": "https://github.com/ORG/REPO/",
-#     "source_branch": "master",
-#     "source_directory": "docs/source/",
-# }
-html_theme_options = {}
+# Replace with your real repository information when ready.
+html_theme_options = {
+    "source_repository": "https://github.com/<ORG>/<REPO>/",
+    "source_branch": "main",
+    "source_directory": "docs/source/",
+}

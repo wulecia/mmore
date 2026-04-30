@@ -163,6 +163,7 @@ paths:
       summary: Retrieve on MMORE
       description: |
         Search for files based on content similarity.
+
         This request is meant to be called by the Gateway to MMORE service upon chat completions request from Moove.
       requestBody:
         required: true

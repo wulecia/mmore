@@ -222,9 +222,7 @@ The `ColPaliRetriever` is a LangChain-compatible `BaseRetriever` that returns `D
 
 ### Process Output
 
-The following examples show example rows and logical fields stored in each Parquet dataset.  
-
-**Embeddings Parquet (`pdf_page_objects.parquet`)**  
+**Embeddings Parquet (`pdf_page_objects.parquet`)**
 ```json
 {
   "pdf_path": "/path/to/doc1.pdf",
@@ -232,7 +230,7 @@ The following examples show example rows and logical fields stored in each Parqu
   "embedding": [0.1, 0.2, "..."]
 }
 ```
-**Text Mapping Parquet (`pdf_page_text.parquet`)**  
+**Text Mapping Parquet (`pdf_page_text.parquet`)**
 ```json
 {
   "pdf_path": "/path/to/doc1.pdf",
@@ -261,40 +259,22 @@ The following examples show example rows and logical fields stored in each Parqu
 ```
 
 **Batch Mode Output:**
-The output file is a JSON array containing one result object per input query.
 ```json
-[
-  {
-    "query": "machine learning",
-    "context": [
-      {
-        "page_content": "Machine learning is a subset of artificial intelligence...",
-        "metadata": {
-          "pdf_name": "ml_book.pdf",
-          "pdf_path": "/path/to/ml_book.pdf",
-          "page_number": 42,
-          "rank": 1,
-          "similarity": 0.894
-        }
+{
+  "query": "machine learning",
+  "context": [
+    {
+      "page_content": "Machine learning is a subset of artificial intelligence...",
+      "metadata": {
+        "pdf_name": "ml_book.pdf",
+        "pdf_path": "/path/to/ml_book.pdf",
+        "page_number": 42,
+        "rank": 1,
+        "similarity": 0.894
       }
-    ]
-  },
-  {
-    "query": "neural networks",
-    "context": [
-      {
-        "page_content": "Neural networks are computing systems inspired by biological neurons...",
-        "metadata": {
-          "pdf_name": "dl_book.pdf",
-          "pdf_path": "/path/to/dl_book.pdf",
-          "page_number": 17,
-          "rank": 1,
-          "similarity": 0.882
-        }
-      }
-    ]
-  }
-]
+    }
+  ]
+}
 ```
 
 ## 🔁 Pipeline Example

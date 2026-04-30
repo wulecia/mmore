@@ -1,38 +1,34 @@
 # 🌐 WebSearch Integration
 
 ## Overview
-The WebSearch integration uses web search providers to retrieve external information and combine it with MMORE retrieval results.
+The WebSearch integration uses the `ddgs` (DuckDuckGo Search) library with optional Tavily support. The implementation combines:
 
-The current implementation supports:
-
-- **DuckDuckGo Search** through the `ddgs` library as the default provider
-- **Tavily Search** as an optional higher-quality provider
-- **LLM integration** to summarize and integrate retrieved web snippets with RAG results into a final answer
+- **DuckDuckGo Search:** default provider — free, no API key needed. Install with `pip install "mmore[rag,websearch]"`.
+- **Tavily Search:** ptional higher-quality provider. Requires `TAVILY_API_KEY` environment variable. Install with `pip install "mmore[rag,websearch]"`.
+- **LLM Integration:** to summarize and integrate retrieved web snippets with RAG results to provide a final answer
 
 This page describes the standalone `websearch` module.  
 It should be distinguished from web search used inside the `rag` pipeline, which is configured separately through the RAG retriever settings.
 
+## Installation & Search Providers
 
-## 📦 Installation and search providers
-
-Install the web search dependencies with:
-
+Install web search dependencies:
 ```bash
 pip install "mmore[rag,websearch]"
 ```
 
-| **Provider** | **Default** | **API key required** | **Notes** |
+| Provider | Default | API Key Required | Notes |
 |---|---|---|---|
-| **DuckDuckGo** | ✅ Yes | ❌ No | Free and available without additional setup |
-| **Tavily** | ❌ No | ✅ Yes (`TAVILY_API_KEY`) | Optional provider with potentially higher-quality results |
+| DuckDuckGo | ✅ Yes | ❌ No | Free, no setup needed |
+| Tavily | ❌ No | ✅ Yes (`TAVILY_API_KEY`) | Higher quality results |
 
 To use Tavily, set the environment variable:
 ```bash
 export TAVILY_API_KEY=your_key_here
 ```
-Configure the provider in your config file:
 
-```bash
+Configure the provider in your config file:
+```yaml
 websearch:
     search_provider: "tavily"   # or "duckduckgo" (default)
     max_retries: 3              # retries on rate limit
@@ -45,10 +41,10 @@ It supports two inference modes:
 1. **API**: runs a server hosting the pipeline
 2. **Local**: runs the inference locally
  
-You can customize various parts of the pipeline by defining a WebSearch inference configuration file such as [`examples/websearchRAG/config_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config_api.yaml).
+You can customize various parts of the pipeline by defining a WebSearch inference configuration file such as [`examples/websearch/config_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config_api.yaml).
 
 
-Users can also adjust the pipeline through parameters defined in files such as [`examples/websearchRAG/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config.yaml).
+Users can also adjust the pipeline through parameters defined in files such as [`examples/websearch/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config.yaml).
 
 Main parameters include:
 
@@ -85,7 +81,7 @@ Here is a example to create a Websearch pipeline hosted through [LangGraph](http
 
 ### 1. Create a config file
 
-Start from the [local example](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config.yaml) or the [API example](https://github.com/swiss-ai/mmore/blob/master/examples/websearchRAG/config_api.yaml).
+Start from the [local example](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config.yaml) or the [API example](https://github.com/swiss-ai/mmore/blob/master/examples/websearch/config_api.yaml).
 
 ### 2. Start the WebSearch pipeline
 

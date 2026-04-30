@@ -23,7 +23,7 @@ In practice, it supports:
 - optional WebRAG and CLI usage in batch mode
 
 You can customize various parts of the pipeline by defining an inference RAG configuration file at
-[`examples/rag/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/config.yaml) or [`examples/rag/config_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/config_api.yaml)
+[`examples/rag/api/rag_api.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/rag/api/rag_api.yaml).
 
 
 ## 💻 Minimal Example:

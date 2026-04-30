@@ -6,7 +6,7 @@ This page explains how to install MMORE.
 
 Four installation paths are currently documented:
 
-- standard installation from PyPI with `pip`
+- installation standard from PyPI with `pip`
 - installation from the source repository with `pip install -e .`
 - installation with `uv`
 - Docker-based setup
@@ -119,10 +119,6 @@ Before running commands, activate the environment:
 ```bash
 source .venv/bin/activate
 ```
-
-### Step 6: Run a test command
-
-After activating the virtual environment, you can run MMORE commands normally.
 
 ---
 

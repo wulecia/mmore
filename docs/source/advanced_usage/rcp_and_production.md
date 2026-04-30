@@ -16,29 +16,27 @@ id -u  # Your user ID
 id -g  # Your group ID
 ```
 
-### 2. Build Docker image with custom IDs — choose one of the two options below:
+### 2. Build Docker image with custom IDs
 
-#### Option A — CI build (recommended)
-Trigger the [Build Student Image](https://github.com/swiss-ai/mmore/blob/master/.github/workflows/push-to-registry.yml) workflow manually from the GitHub Actions tab (*Run workflow*) and input your user UID and group GID. This builds a custom student GPU image published to GHCR, tagged as:
+Choose one of the two options below:  
 
-```bash
+**Option A — CI build (recommended):** Trigger the [Build Student Image](../.github/workflows/push-to-registry.yml) workflow manually from the GitHub Actions tab (*Run workflow*) and input your user UID and group GID. This builds a custom student GPU image published to GHCR, tagged as:
+```
 ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu
 ```
-You can then pull it directly with `docker pull`. Skip to step 5.
+You can then pull it directly with `docker pull`. Skip to step 5.  
 
-#### Option B — local build:
-
-Replace ` <user-id>` and `<group-id>` with your actual values.
+**Option B — local build** (replace `<user-id>` and `<group-id>` with your actual IDs):
 ```bash
 sudo docker build -f docker/ubuntu/Dockerfile --build-arg USER_UID=<user-id> --build-arg USER_GID=<group-id> -t mmore .
 ```
 
-### 3. Login to DockerHub (option B only)
+**Login to DockerHub** *(option B only)*:  
 ```bash
 docker login docker.io
 ```
 
-### 4. Push the image to the registry (option B only)
+**Push the image to the registry** *(option B only)*:  
 Replace `username` with your DockerHub username.
 
  ```bash
@@ -46,9 +44,8 @@ Replace `username` with your DockerHub username.
    docker push docker.io/<username>/mmore:latest
 ```
 
-
-### 5. Identify your image reference
-All runai commands below use `<image>` as a placeholder. Replace it with:  
+### 3. Identify your image reference 
+all `runai` commands below use `<image>` as a placeholder. Replace it with:
 - Option A: `ghcr.io/swiss-ai/mmore:student-uid<user-id>-gid<group-id>-gpu`
 - Option B: `docker.io/<username>/mmore:latest`
 
@@ -84,8 +81,7 @@ For development, debugging, or manual operations, you can start an interactive s
 The example below assumes a Run:ai-based environment. Replace `<group-id>` with your actual group ID. 
 
 ```bash
-runai submit \
-  --name mmore-dev \
+runai submit swissaimmore \
   --image <image> \
   --node-pool h100 \
   --pvc light-scratch:/lightscratch \
@@ -112,7 +108,7 @@ Replace `<group-id>` with your actual group ID.
 
 ```bash
 runai submit \
-  --name mmore-process \
+  --name swissaimmore-process \
   --image <image> \
   --backoff-limit 0 \
   --pvc light-scratch:/lightscratch \
@@ -130,7 +126,7 @@ Clean and structure the extracted data.
 
 ```bash
 runai submit \
-  --name mmore-postprocess \
+  --name swissaimmore-postprocess \
   --image <image> \
   --backoff-limit 0 \
   --pvc light-scratch:/lightscratch \
@@ -148,7 +144,7 @@ Create searchable vector indexes.
 
 ```bash
 runai submit \
-  --name mmore-index \
+  --name swissaimmore-index \
   --image <image> \
   --backoff-limit 0 \
   --pvc light-scratch:/lightscratch \
@@ -166,7 +162,7 @@ Deploy the retrieval API service.
 
 ```bash
 runai submit \
-  --name mmore-rag \
+  --name swissaimmore-rag \
   --image <image> \
   --backoff-limit 0 \
   --pvc light-scratch:/lightscratch \
@@ -184,7 +180,7 @@ runai submit \
 To access the service locally, use:
 
 ```bash
-runai port-forward mmore-rag 8080:8080
+runai port-forward swissaimmore-rag 8080:8080
 ```
 
 

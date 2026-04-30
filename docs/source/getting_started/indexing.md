@@ -35,7 +35,7 @@ Adjust it to match your setup and indexing needs.
 
 Once the configuration file is ready, launch the indexing pipeline with:
 ```bash
-python3 -m mmore index --config-file /path/to/config.yaml
+python3 -m mmore index --config_file /path/to/config.yaml
 ```
 
 ## Notes

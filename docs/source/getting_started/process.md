@@ -4,8 +4,6 @@
 
 The process module enables the extraction and standardization of text and images from diverse file formats (listed below), making it ideal for creating datasets for applications such as RAG, multimodal content generation, and preprocessing data for multimodal LLMs and LLMs.
 
----
-
 ## 🔨Quick Start
 ### 👩‍💻 Global installation
 Set up the project on each device you want to use by following [Installation](installation.md).
@@ -17,15 +15,6 @@ Once ready, run:
 ```bash
 python3 -m mmore process --config-file examples/process/config.yaml
 ```
-
-### 💻 Running with Docker
-
-If you installed MMORE with Docker, you can start a container with the examples folder and cache mounted as volumes:
-```bash
-sudo docker run -it -v ./examples:/app/examples -v ./.cache:/mmoreuser/.cache mmore
-```
-
-Inside the container, this corresponds to the default path used in [`examples/process/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/process/config.yaml).
 
 ### 📌 Google Drive support
 MMORE also supports processing documents directly from **Google Drive**.
@@ -66,16 +55,18 @@ You can find an example config file in [`examples/process/config.yaml`](https://
 
 The output of the pipeline has the following structure:
 ```
-output_path  
-├── processors  
-│   ├── Processor_type_1  
-│   │   └── results.jsonl  
-│   ├── Processor_type_2  
-│   │   └── results.jsonl  
-│   └── ...  
-├── merged  
-│   └── merged_results.jsonl  
-└── images  
+output_path
+├── processors
+│   ├── Processor_type_1
+│   │   └── results.jsonl
+│   ├── Processor_type_2
+│   │   └── results.jsonl
+│   ├── ...
+│   
+└── merged
+│    └── merged_results.jsonl
+|
+└── images
 ```
 ### 🚀 Running on distributed nodes
 
@@ -86,6 +77,7 @@ bash scripts/process_distributed.sh -f /path/to/my/input/folder
 ```
 
 See also [Distributed processing](../advanced_usage/distributed_processing.md).
+
 
 ### 📜 Examples
 You can find additional example scripts in the [`/examples`](https://github.com/swiss-ai/mmore/blob/master/examples) directory.
@@ -155,18 +147,18 @@ The goal is to make it easy to add new processors for new file types, or alterna
 
 The project supports multiple file types and utilizes various AI-based tools for processing. Below is a table summarizing the supported file types and corresponding tools (N/A means no choice):
 
-
-| **File type** | **Default mode tool(s)** | **Fast mode tool(s)** |
-|---|---|---|
-| **DOCX** | [python-docx](https://python-docx.readthedocs.io/en/latest/) for text and image extraction | N/A |
-| **MD** | [markdown](https://python-markdown.github.io/) for text extraction, [markdownify](https://pypi.org/project/markdownify/) for HTML conversion | N/A |
-| **PPTX** | [python-pptx](https://python-pptx.readthedocs.io/en/latest/) for text and image extraction | N/A |
-| **XLSX** | [openpyxl](https://openpyxl.readthedocs.io/en/stable/) for text and image extraction | N/A |
-| **TXT** | [Python built-in library](https://docs.python.org/3/library/functions.html#open) | N/A |
-| **EML** | [Python built-in library](https://docs.python.org/3/library/email.html) | N/A |
-| **MP4, MOV, AVI, MKV, MP3, WAV, AAC** | [moviepy](https://pypi.org/project/moviepy/) for video frame extraction; [whisper-large-v3-turbo](https://huggingface.co/openai/whisper-large-v3-turbo) for transcription | [whisper-tiny](https://huggingface.co/openai/whisper-tiny) |
-| **PDF** | [marker-pdf](https://github.com/VikParuchuri/marker) for OCR and structured extraction | [PyMuPDF](https://github.com/pymupdf/PyMuPDF) for text and image extraction |
-| **HTML** | [markdownify](https://pypi.org/project/markdownify/) to convert HTML to Markdown; [requests](https://docs.python-requests.org/en/master/) for images | N/A |
+| **File Type**                         | **Default Mode Tool(s)**                                                                                                          | **Fast Mode Tool(s)**                                                                                                         |
+|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| **DOCX**                              | [python-docx](https://python-docx.readthedocs.io/en/latest/) to extract the text and images.                                      | N/A                                                                                                                         |
+| **MD**                                | [markdown](https://python-markdown.github.io/) for text extraction, [markdownify](https://pypi.org/project/markdownify/) for HTML conversion | N/A                                                                                                                         |
+| **PPTX**                              | [python-pptx](https://python-pptx.readthedocs.io/en/latest/) to extract the text and images.                                      | N/A                                                                                                                         |
+| **XLSX**                              | [openpyxl](https://openpyxl.readthedocs.io/en/stable/) to extract the text and images.                                           | N/A                                                                                                                         |
+| **TXT**                               | [python built-in library](https://docs.python.org/3/library/functions.html#open)                                                 | N/A                                                                                                                         |
+| **EML**                               | [python built-in library](https://docs.python.org/3/library/email.html) | N/A                                                                                                                         |
+| **MP4, MOV, AVI, MKV, MP3, WAV, AAC** | [moviepy](https://pypi.org/project/moviepy/) for video frame extraction; [whisper-large-v3-turbo](https://huggingface.co/openai/whisper-large-v3-turbo) for transcription | [whisper-tiny](https://huggingface.co/openai/whisper-tiny)                                                                  |
+| **PDF**                               | [marker-pdf](https://github.com/VikParuchuri/marker) for OCR and structured data extraction                                      | [PyMuPDF](https://github.com/pymupdf/PyMuPDF) for text and image extraction                                                 |
+| **HTML**                         | [markdownify](https://pypi.org/project/markdownify/) to convert HTML to MD; [requests](https://docs.python-requests.org/en/master/) for images | N/A
+---
 
 MMORE also uses [Dask Distributed](https://distributed.dask.org/en/latest/) to manage distributed execution.
 
@@ -179,7 +171,7 @@ For a minimal example, see [`TextProcessor`](https://github.com/swiss-ai/mmore/b
 
 ## 🧹 Post-processing
 
-Post-processing refines the extracted text data to improve quality for downstream tasks. The infrastructure is modular and extensible: MMORE natively supports the following post-processors: 
+Post-processing refines the extracted text data to improve quality for downstream tasks. The infrastructure is modular and extensible: mmore natively supports the following post-processors: 
 
 - [`Chunker`](https://github.com/swiss-ai/mmore/blob/master/src/mmore/process/post_processor/chunker)
 - [`Filter`](https://github.com/swiss-ai/mmore/blob/master/src/mmore/process/post_processor/filter)
@@ -199,17 +191,8 @@ The chunker supports a `table_handling` option to control how markdown tables ar
 
 
 
-The chunker also supports a `table_handling` option to control how Markdown tables are split:
+You can configure parameters by providing a custom config file. This field is shown in the example config file at [`examples/process/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/process/config.yaml).
 
-| **Mode** | **Description** |
-|---|---|
-| `single_row` *(default)* | Each table row is placed in its own chunk, with the header repeated for context. |
-| `multi_rows` | Rows are grouped together to fill the target chunk size, with the header repeated in each chunk. |
-| `keep_whole` | Tables are never split and are kept as a single chunk regardless of size. |
-| `none` | No special table handling is applied; tables are chunked like regular text. |
-
-
-You can configure post-processing through a custom YAML file. An example is provided in [`examples/postprocessor/config.yaml`](https://github.com/swiss-ai/mmore/blob/master/examples/postprocessor/config.yaml).
 
 Once ready, you can run the process using the following command:
 ```bash
